@@ -1,0 +1,35 @@
+npmRebuild: false # 是否在开始编译前重构原生依赖,可先尝试true, 如果出现问题再修改为false
+directories:
+    output: release-builds
+    # buildResources: build
+files:
+    - filter:
+          - bld/**/*
+          - static/**/*
+          - dist/**/*
+          - node_modules/**/*
+nsis:
+    oneClick: false # 是否一键安装(静默安装)
+    allowToChangeInstallationDirectory: true # 允许用户选择安装位置
+    createDesktopShortcut: always # 创建桌面快捷方式
+    createStartMenuShortcut: true # 创建开始菜单快捷方式
+    runAfterFinish: true # 安装完成后是否勾选立即执行
+    perMachine: true # 是否开启安装时权限限制（此电脑或当前用户）
+    allowElevation: true # 需与perMachine: true 配合使用，则不让用选择（此电脑或当前用户）
+dmg:
+    contents:
+        - x: 410
+          "y": 150
+          type: link
+          path: /Applications
+        - x: 130
+          "y": 150
+          type: file
+mac:
+    asar: false
+    category: office
+win:
+    asar: false
+    target:
+        - nsis
+    verifyUpdateCodeSignature: false # 是否需要验证签名

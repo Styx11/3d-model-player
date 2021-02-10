@@ -1,0 +1,76 @@
+{
+	"name": "frontend-log-client",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"scripts": {
+		"dev": "./scripts/dev.sh",
+		"clean": "rm -rf ./dist/**",
+		"test:unit": "cross-env NODE_ENV=test yarn jest --notify --config=test/unit/jest.config.js",
+		"build:prod": "yarn clean && webpack --config config/webpack.prod.conf.js"
+	},
+	"devDependencies": {
+		"@babel/node": "^7.8.7",
+		"@babel/plugin-transform-runtime": "^7.12.1",
+		"@babel/preset-env": "^7.9.0",
+		"@types/webpack-env": "^1.15.3",
+		"@typescript-eslint/eslint-plugin": "^4.6.1",
+		"@typescript-eslint/parser": "^4.6.1",
+		"@vue/compiler-sfc": "^3.0.2",
+		"@vue/test-utils": "^2.0.0-beta.14",
+		"babel-jest": "26.1.0",
+		"babel-loader": "8.1.0",
+		"babel-plugin-import": "^1.13.1",
+		"copy-webpack-plugin": "6.2.1",
+		"cross-env": "^7.0.2",
+		"css-loader": "5.0.0",
+		"dotenv-webpack": "^5.1.0",
+		"enhanced-resolve": "4.2.0",
+		"eslint": "^7.17.0",
+		"eslint-webpack-plugin": "^2.2.0",
+		"html-webpack-plugin": "4.5.0",
+		"identity-obj-proxy": "^3.0.0",
+		"jest": "26.0.0",
+		"jest-css-modules-transform": "^4.0.2",
+		"jest-environment-jsdom-fifteen": "^1.0.2",
+		"jest-serializer-vue": "^2.0.0",
+		"jest-transform-stub": "^2.0.0",
+		"less": "2.7.3",
+		"less-loader": "7.0.2",
+		"mini-css-extract-plugin": "1.2.0",
+		"svg-sprite-loader": "5.0.0",
+		"ts-import-plugin": "1.6.6",
+		"ts-loader": "^6.2.2",
+		"typescript": "^3.8.3",
+		"url-loader": "4.1.1",
+		"vue-jest": "5.0.0-alpha.7",
+		"vue-loader": "16.1.2",
+		"vue-style-loader": "4.1.2",
+		"webpack": "^4.42.1",
+		"webpack-cli": "^3.3.11",
+		"webpack-dev-server": "^3.10.3",
+		"webpack-merge": "4.1.0"
+	},
+	"dependencies": {
+		"@ant-design/icons-vue": "^5.1.5",
+		"ant-design-vue": "^2.0.0-rc.6",
+		"crypto-js": "^4.0.0",
+		"vue": "3.0.5",
+		"vue-router": "^4.0.2",
+		"vuex": "^4.0.0-rc.2"
+	},
+	"sideEffects": [
+		"*.css",
+		"src/**/**",
+		"src/**/*.vue"
+	],
+	"engines": {
+		"node": ">= 6.0.0",
+		"npm": ">= 3.0.0"
+	},
+	"browserslist": [
+		"> 1%",
+		"last 2 versions",
+		"not ie <= 8"
+	]
+}

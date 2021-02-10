@@ -1,0 +1,28 @@
+{
+	"name": "3d-model-player",
+	"version": "1.0.0",
+	"description": "cross-platform 3d model player based on electron and vue3",
+	"main": "./bld/src/main.js",
+	"repository": "git@github.com:Styx11/3d-model-player.git",
+	"author": "styx11 <1654630248@qq.com>",
+	"license": "MIT",
+	"scripts": {
+		"compile": "rm -r bld || true && ttsc",
+		"dev:view": "cd views && yarn dev",
+		"dev": "NODE_DEBUG=performance && yarn compile && cp ./package.json ./bld/package.json && run-electron ./bld/src/main.js --dev",
+		"build:mac": "node ./scripts/build.js && electron-builder --mac --config electron-builder.yml",
+		"build:win": "node ./scripts/build.js && electron-builder --x64 --win --config electron-builder.yml"
+	},
+	"devDependencies": {
+		"chalk": "^4.1.0",
+		"electron": "^11.2.2",
+		"electron-builder": "^22.9.1",
+		"electron-reload": "^1.5.0",
+		"mkdirp": "^1.0.4",
+		"rimraf": "^3.0.2",
+		"run-electron": "^1.0.0",
+		"ttypescript": "^1.5.12",
+		"typescript": "^4.1.3",
+		"typescript-transform-paths": "^2.2.3"
+	}
+}

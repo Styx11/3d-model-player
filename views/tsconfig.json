@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"target": "es6",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"importHelpers": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"allowJs": true,
+		"sourceMap": true,
+		"types": [
+			"webpack-env"
+			// "jest"
+		],
+		"baseUrl": "." /* Base directory to resolve non-absolute module names. */,
+		"paths": {
+			"@/*": [
+				"src/*"
+			]
+		},
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable",
+			"scripthost"
+		],
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue",
+		"tests/**/*.ts",
+		"tests/**/*.tsx",
+		"src/vue-shims.d.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
