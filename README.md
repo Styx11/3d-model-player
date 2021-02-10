@@ -1,11 +1,12 @@
-# Vue3-election-boilerplate
-> election boilerplate with vue3
+# 3d-model-player
+> cross-platform 3d model player based on electron and vue3
 
 ## 技术栈选型
 * Vue, Vue-Router, Vuex
 * Ant-Design-Vue
 * TypeScript
 * Electron
+* Cesium
 * Less
 
 ## 文件结构
