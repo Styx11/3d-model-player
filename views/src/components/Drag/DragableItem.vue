@@ -15,6 +15,7 @@
 
 <style lang="less" scoped>
 	.dragable_item {
+		display: inline-block;
 		-webkit-app-region: no-drag;
 	}
 </style>
