@@ -1,15 +1,23 @@
 <template>
-	<div class="login_home_container">This is login home</div>
+	<div class="login_home_container">
+		<TitleBar />
+		<p class="link">
+			<router-link to="/home">To home</router-link>
+		</p>
+	</div>
 </template>
 
 <script lang="ts">
 	import { defineComponent } from 'vue'
 	import { Button } from 'ant-design-vue';
 
+	import TitleBar from '@/components/TitleBar';
+
 	export default defineComponent({
 		name: 'login-home',
 		components: {
 			Button,
+			TitleBar,
 		},
 		methods: {
 			handleLoginClick()
@@ -31,5 +39,8 @@
 		padding: 0;
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
+		.link {
+			margin-top: 100px;
+		}
 	}
 </style>

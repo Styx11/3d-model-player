@@ -1,12 +1,17 @@
 <template>
-	<div class="project_home_container">hello</div>
+	<div class="project_home_container">
+		<TitleBar />
+	</div>
 </template>
 
 <script lang='ts'>
 	import { defineComponent } from 'vue'
+	import TitleBar from '@/components/TitleBar';
+
 	export default defineComponent({
 		name: 'project-home',
 		components: {
+			TitleBar
 		},
 		computed: {
 		},
