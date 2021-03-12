@@ -115,7 +115,6 @@
 				}
 				.header_watcher {
 					flex: 1 0 auto;
-
 					.label(12px, @WHITE_COLOR);
 					.flexContainer(row, flex-end);
 				}
