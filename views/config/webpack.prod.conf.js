@@ -47,7 +47,7 @@ module.exports = merge(baseConfig, {
 	plugins: [
 		// 自动注入 html 文件依赖
 		new HtmlWebpackPlugin({
-			title: '日志客户端',
+			title: '3d-model-player',
 			filename: resolve('dist/index.html'),
 			template: resolve('public/template.html'),
 			inject: true,
