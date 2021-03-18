@@ -2,7 +2,8 @@ import { ComponentCustomProperties, ComponentOptions } from 'vue'
 import { Store } from 'vuex'
 
 declare module '*.vue' {
-	const component: ComponentOptions
+	import type { DefineComponent } from 'vue'
+	const component: DefineComponent<{}, {}, any>
 	export default component
 }
 
