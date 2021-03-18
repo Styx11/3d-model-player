@@ -1,15 +1,21 @@
 import { RouteRecordRaw } from 'vue-router'
+import List from '@/pages/list/List.vue'
 import Login from '@/pages/login/Login.vue'
 import LoginHome from '@/pages/login/components/LoginHome.vue'
 
 const routes: Array<RouteRecordRaw> = [
+	// {
+	// 	path: '/',
+	// 	name: 'Login',
+	// 	component: Login,
+	// 	children: [
+	// 		{ path: '', name: 'LoginHome', component: LoginHome },
+	// 	]
+	// },
 	{
 		path: '/',
-		name: 'Login',
-		component: Login,
-		children: [
-			{ path: '', name: 'LoginHome', component: LoginHome },
-		]
+		name: 'List',
+		component: List,
 	},
 	{
 		path: '/home',
