@@ -115,7 +115,5 @@ module.exports = {
 			filename: 'static/css/[name].[contenthash].css',
 		}),
 
-
-
 	]
 }

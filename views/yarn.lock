@@ -41,14 +41,13 @@
     "@babel/runtime" "^7.10.4"
     lodash "^4.17.15"
 
-"@ant-design/icons-vue@^5.1.9":
-  version "5.1.9"
-  resolved "https://registry.npm.taobao.org/@ant-design/icons-vue/download/@ant-design/icons-vue-5.1.9.tgz#8d741a3290be61af7c71618c308cc1a946c4e434"
-  integrity sha1-jXQaMpC+Ya98cWGMMIzBqUbE5DQ=
+"@ant-design/icons-vue@^6.0.0":
+  version "6.0.1"
+  resolved "https://registry.npm.taobao.org/@ant-design/icons-vue/download/@ant-design/icons-vue-6.0.1.tgz?cache=0&sync_timestamp=1611990511152&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40ant-design%2Ficons-vue%2Fdownload%2F%40ant-design%2Ficons-vue-6.0.1.tgz#9d804c3c74d2cfaf97cb18e582d3b9400934f5fd"
+  integrity sha1-nYBMPHTSz6+XyxjlgtO5QAk09f0=
   dependencies:
     "@ant-design/colors" "^5.0.0"
     "@ant-design/icons-svg" "^4.0.0"
-    "@babel/runtime" "^7.10.4"
     "@types/lodash" "^4.14.165"
     lodash "^4.17.15"
 
@@ -1350,12 +1349,12 @@
   dependencies:
     mkdirp "^1.0.4"
 
-"@simonwep/pickr@~1.7.0":
-  version "1.7.4"
-  resolved "https://registry.npm.taobao.org/@simonwep/pickr/download/@simonwep/pickr-1.7.4.tgz#b14fcd945890388b870cd6db4d6c78d531f25141"
-  integrity sha1-sU/NlFiQOIuHDNbbTWx41THyUUE=
+"@simonwep/pickr@~1.8.0":
+  version "1.8.0"
+  resolved "https://registry.npm.taobao.org/@simonwep/pickr/download/@simonwep/pickr-1.8.0.tgz?cache=0&sync_timestamp=1607167040192&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40simonwep%2Fpickr%2Fdownload%2F%40simonwep%2Fpickr-1.8.0.tgz#adbff9a4f7f0e59dec9946508c5e481b7abae0f8"
+  integrity sha1-rb/5pPfw5Z3smUZQjF5IG3q64Pg=
   dependencies:
-    core-js "^3.6.5"
+    core-js "^3.8.0"
     nanopop "^2.1.0"
 
 "@sinonjs/commons@^1.7.0":
@@ -2138,15 +2137,15 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
     "@types/color-name" "^1.1.1"
     color-convert "^2.0.1"
 
-ant-design-vue@^2.0.0-rc.6:
-  version "2.0.0-rc.8"
-  resolved "https://registry.npm.taobao.org/ant-design-vue/download/ant-design-vue-2.0.0-rc.8.tgz#0f219aedb27f1797228aab79fbbd8328a7389a9f"
-  integrity sha1-DyGa7bJ/F5ciiqt5+72DKKc4mp8=
+ant-design-vue@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.npm.taobao.org/ant-design-vue/download/ant-design-vue-2.0.1.tgz#3a5964523aac10fd2b16d84d651145cd2b65f1d5"
+  integrity sha1-OllkUjqsEP0rFthNZRFFzStl8dU=
   dependencies:
     "@ant-design-vue/use" "^0.0.1-0"
-    "@ant-design/icons-vue" "^5.1.9"
+    "@ant-design/icons-vue" "^6.0.0"
     "@babel/runtime" "^7.10.5"
-    "@simonwep/pickr" "~1.7.0"
+    "@simonwep/pickr" "~1.8.0"
     array-tree-filter "^2.1.0"
     async-validator "^3.3.0"
     dom-align "^1.10.4"
@@ -3240,10 +3239,10 @@ core-js@^3.2.1:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.6.4.tgz#440a83536b458114b9cb2ac1580ba377dc470647"
   integrity sha512-4paDGScNgZP2IXXilaffL9X7968RuvwlkK3xWtZRVqgd8SYNiVKRJvkFd1aqqEuPfN7E68ZHEp9hDj6lHj4Hyw==
 
-core-js@^3.6.5:
-  version "3.7.0"
-  resolved "https://registry.npm.taobao.org/core-js/download/core-js-3.7.0.tgz?cache=0&sync_timestamp=1604675498528&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.7.0.tgz#b0a761a02488577afbf97179e4681bf49568520f"
-  integrity sha1-sKdhoCSIV3r7+XF55Ggb9JVoUg8=
+core-js@^3.8.0:
+  version "3.9.1"
+  resolved "https://registry.npm.taobao.org/core-js/download/core-js-3.9.1.tgz?cache=0&sync_timestamp=1614537310447&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.9.1.tgz#cec8de593db8eb2a85ffb0dbdeb312cb6e5460ae"
+  integrity sha1-zsjeWT246yqF/7Db3rMSy25UYK4=
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -3436,6 +3435,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+dayjs@^1.10.4:
+  version "1.10.4"
+  resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.10.4.tgz?cache=0&sync_timestamp=1611309982734&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdayjs%2Fdownload%2Fdayjs-1.10.4.tgz#8e544a9b8683f61783f570980a8a80eaf54ab1e2"
+  integrity sha1-jlRKm4aD9heD9XCYCoqA6vVKseI=
 
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"

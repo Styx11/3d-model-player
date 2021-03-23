@@ -55,13 +55,14 @@
 		"@ant-design/icons-vue": "^5.1.5",
 		"ant-design-vue": "^2.0.0",
 		"crypto-js": "^4.0.0",
+		"dayjs": "^1.10.4",
 		"vue": "3.0.5",
 		"vue-router": "^4.0.2",
 		"vuex": "^4.0.0-rc.2"
 	},
 	"sideEffects": [
 		"*.css",
-		"src/**/**",
+		"src/**/*",
 		"src/**/*.vue"
 	],
 	"engines": {
