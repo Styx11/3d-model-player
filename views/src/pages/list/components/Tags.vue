@@ -14,7 +14,7 @@
 
 <script lang="ts">
 	// 该标签展示组件是一个受控组件，通过 v-model:checkedTag 控制当前选中的标签
-	import { defineComponent, toRefs } from 'vue'
+	import { defineComponent, toRefs, PropType } from 'vue'
 	import { Tag } from 'ant-design-vue'
 	const { CheckableTag } = Tag
 
@@ -25,7 +25,7 @@
 		},
 		props: {
 			tags: {
-				type: Array,
+				type: Array as PropType<Array<string>>,
 				required: true,
 			},
 			checkedTag: {
