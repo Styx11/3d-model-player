@@ -14,6 +14,7 @@
 			:confirm-loading="confirmLoading"
 			:closable="cancelable"
 			:cancelButtonProps="{ disabled: !cancelable}"
+			:destroyOnClose="true"
 			okText="上传"
 			@ok="handleModalOk"
 			:width="860"
@@ -24,6 +25,7 @@
 						<UploadDragger
 							name="modelFile"
 							:action="customAction"
+							:fileList="fileList"
 							:customRequest="customUpload"
 							:remove="customRemove"
 							accept=".obj, .fbx, .dae, .gltf, .glb"
@@ -43,11 +45,11 @@
 							:rules="formRules"
 							ref="formRef"
 						>
-							<FormItem label="Model CreatedAt" name="createAt">
-								<DatePicker v-model:value="formState.createAt" />
+							<FormItem label="Collect location" name="location">
+								<Input v-model:value="formState.location" placeholder="采集地点" />
 							</FormItem>
-							<FormItem label="Model Name" name="name">
-								<Input v-model:value="formState.name" placeholder="模型名称" />
+							<FormItem label="Model Title" name="title">
+								<Input v-model:value="formState.title" placeholder="模型名称" />
 							</FormItem>
 							<FormItem label="Model Tag" name="tag">
 								<Input v-model:value="formState.tag" placeholder="模型分类" />
@@ -71,13 +73,14 @@
 <script lang="ts">
 	import { defineComponent, ref, toRaw } from 'vue'
 	import { InboxOutlined } from '@ant-design/icons-vue'
-	import { Modal, Row, Col, Button, Form, Input, DatePicker, Upload } from 'ant-design-vue'
+	import { Modal, Row, Col, Button, Form, Input, Upload, message } from 'ant-design-vue'
 	import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 	import { ValidationRule } from 'ant-design-vue/lib/form/Form'
 
 	import '@/static/image/pic-jiance-bg.jpg'
+	import { useStore } from '../../../store'
 	import { IModelFormState } from '../../../interface/Types'
-	import { useModelAction, useModelUpload, useModelRemove } from '../../../hooks/upload'
+	import { useModelAction, useModelUpload, useModelRemove, useUploadConfirm, _fileList } from '../../../hooks/upload'
 	import { useState, useCollectionState, UnwrapNestedRefs } from '../../../hooks/index'
 
 	const { Dragger: UploadDragger } = Upload
@@ -99,34 +102,36 @@
 			FormItem,
 			Input,
 			TextArea,
-			DatePicker,
 			UploadDragger,
 			InboxOutlined,
 		},
 		setup()
 		{
+			const store = useStore()
 			// Form 相关
 			const formRef = ref()
-			const [formState, setFormState] = useCollectionState<IModelFormState>({
-				name: '',
-				tag: '',
+			const initialFormValue: IModelFormState = {
+				title: '',
+				tag: '未分类',
 				desc: '',
-				createdAt: '',
-			})
+				location: '',
+			}
+			const [formState, setFormState] = useCollectionState<IModelFormState>(Object.assign({}, initialFormValue))
 			const [formRules, setFormRules] = useCollectionState<FormRules>({
-				name: [
+				title: [
 					{ required: true, message: '请输入模型名称', trigger: 'blur' },
 					{ min: 2, max: 10, message: '模型名称的长度应当大于 2 且小于 10', trigger: 'blur' },
 				],
 				tag: [{ required: true, message: '请输入模型分属的类别', trigger: 'blur' }],
 				desc: [{ required: true, message: '请输入模型的描述信息', trigger: 'blur' }],
-				createAt: [{ required: true, message: '请选择模型的创建时间', trigger: 'change', type: 'object' }],
+				location: [{ required: true, message: '请输入采集地点', trigger: 'blur' }],
 			})
 
 			// Upload 相关
 			const customAction = useModelAction()
 			const customUpload = useModelUpload()
 			const customRemove = useModelRemove()
+			const uploadFile = useUploadConfirm(store)
 
 			// Modal 相关
 			const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
@@ -140,28 +145,29 @@
 			{
 				setModalVisible(false)
 			}
-			const handleModalOk = () =>
+			const handleModalOk = async () =>
 			{
 				// 上传过程中不可关闭
-				setCancelable(false)
-				setConfirmLoading(true)
-				formRef.value.validate()
-					.then(() =>
-					{
-						console.log('form values =>', formState);
-						setTimeout(() =>
-						{
-							setCancelable(true)
-							setConfirmLoading(false)
-							hideModal()
-						}, 2000)
-					})
-					.catch((error: ValidateErrorEntity<IModelFormState>) =>
-					{
-						setCancelable(true)
-						setConfirmLoading(false)
-						console.log('error', error)
-					})
+				try
+				{
+					setCancelable(false)
+					setConfirmLoading(true)
+
+					await formRef.value.validate()
+					await uploadFile(formState)
+
+					// 上传成功后销毁当前表单
+					setFormState(Object.assign({}, initialFormValue))
+					setCancelable(true)
+					setConfirmLoading(false)
+					hideModal()
+				}
+				catch (error)
+				{
+					setCancelable(true)
+					setConfirmLoading(false)
+					message.error({ content: '上传错误！', key: 'upload_failed' })
+				}
 			}
 
 			return {
@@ -171,6 +177,7 @@
 				customAction,
 				customUpload,
 				customRemove,
+				fileList: _fileList,
 				modalVisible,
 				showModal,
 				hideModal,

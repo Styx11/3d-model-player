@@ -2,12 +2,15 @@
 	<div class="tags_container">
 		<section class="tags_header">Tags</section>
 		<section class="tags_main">
-			<CheckableTag
-				v-for="(tag, index) in tags"
-				:key="index"
-				:checked="checkedTag === tag"
-				@click="checkTag(tag)"
-			>{{ tag }}</CheckableTag>
+			<div v-if="tags.length">
+				<CheckableTag
+					v-for="(tag, index) in tags"
+					:key="index"
+					:checked="checkedTag === tag"
+					@click="checkTag(tag)"
+				>{{ tag }}</CheckableTag>
+			</div>
+			<div v-else class="no_tags">暂无分类</div>
 		</section>
 	</div>
 </template>
@@ -89,6 +92,14 @@
 				&.ant-tag-checkable-checked {
 					background: @PRIMARY_COlOR;
 				}
+			}
+			.no_tags {
+				width: 100%;
+				height: 44px;
+				flex-shrink: 0;
+				padding: 8px 0;
+				.label(16px, @FONT_SUB);
+				.flexContainer(row);
 			}
 		}
 	}

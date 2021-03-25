@@ -15,9 +15,10 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, ref, watch } from 'vue'
+	import { defineComponent, ref, watch, computed } from 'vue'
 	import { Button } from 'ant-design-vue'
 
+	import { useStore } from '../../store'
 	import Tags from './components/Tags.vue'
 	import Cards from './components/Cards.vue'
 	import TitleBar from '@/components/TitleBar'
@@ -32,8 +33,11 @@
 		},
 		setup()
 		{
+			const store = useStore()
+			const tags = computed<Array<string>>(() => [...new Set(store.state.modelFile.fileList.map(f => f.tag))])
+
 			const checkedTag = ref<string>('')
-			const tags = ref<Array<string>>([...new Set(['sdasd', 'taasasf', 'asd', 'sdad', 'sda', 'tasasf', 'asdsd'])])
+			// const tags = ref<Array<string>>([...new Set(['sdasd', 'taasasf', 'asd', 'sdad', 'sda', 'tasasf', 'asdsd'])])
 
 			watch(checkedTag, newVal => console.log(newVal))
 
