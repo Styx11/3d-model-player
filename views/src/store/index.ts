@@ -1,24 +1,33 @@
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
+import { ModelFile, file } from './file/index'
 
 // typing vuex
 // https://next.vuex.vuejs.org/guide/typescript-support.html#typing-store-property-in-vue-component
-export interface State
+export interface RootState
 {
-	[params: string]: any;
 }
 
-export const key: InjectionKey<Store<State>> = Symbol()
+// vuex 模块化 typescript 支持
+// https://blog.csdn.net/fanweilin0123/article/details/109903447
+export interface AllState extends RootState
+{
+	modelFile: ModelFile
+}
+
+export const key: InjectionKey<Store<RootState>> = Symbol('vue-store')
 
 // define your own `useStore` composition function
+// 只能在 setup 函数的最顶级使用
 export function useStore()
 {
-	return baseUseStore(key)
+	return baseUseStore<AllState>(key)
 }
 
 
-export default createStore<State>({
+export default createStore<RootState>({
 	modules: {
+		modelFile: file,
 	},
 	state: {
 	},

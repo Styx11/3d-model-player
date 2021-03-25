@@ -2,13 +2,13 @@ import { createApp, App } from 'vue'
 
 import AppComponent from './App.vue'
 import Icon from './components/Icon.vue'
-import store from './store'
+import store, { key } from './store'
 import router from './router'
 
 const initVueApp = () =>
 {
 	const app = createApp(AppComponent)
-		.use(store)
+		.use(store, key)
 		.use(router)
 
 	registerSvg(app)
