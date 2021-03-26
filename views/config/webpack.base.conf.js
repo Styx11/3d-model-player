@@ -102,6 +102,7 @@ module.exports = {
 			// on the first HMR update and causes the page to reload.
 			vue: '@vue/runtime-dom',
 			'@': resolve('src'),
+			'@main': resolve('../src'),
 		},
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', 'd.ts', '.tsx', '.js', '.vue'],

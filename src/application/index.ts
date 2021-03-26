@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron'
+import IPCMainManager from '../ipc/IPCMainManager'
 
 function createWindow(): BrowserWindow
 {
@@ -41,6 +42,7 @@ export default class Application
 		app.whenReady().then(() =>
 		{
 			this._win = createWindow()
+			IPCMainManager.getInstance().init()
 		})
 
 		app.on('window-all-closed', () =>
