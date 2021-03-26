@@ -15,8 +15,11 @@
 		],
 		"baseUrl": "." /* Base directory to resolve non-absolute module names. */,
 		"paths": {
+			"@main/*": [
+				"../src/*"
+			],
 			"@/*": [
-				"src/*"
+				"./src/*"
 			]
 		},
 		"lib": [
