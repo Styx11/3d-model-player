@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron'
 import IPCMainManager from '../ipc/IPCMainManager'
+import ModelManager from '../model/ModelManager'
 
 function createWindow(): BrowserWindow
 {
@@ -10,8 +11,9 @@ function createWindow(): BrowserWindow
 		titleBarStyle: 'hiddenInset',
 		webPreferences: {
 			nodeIntegration: true,
+			contextIsolation: false,
 			devTools: true,
-		}
+		},
 	})
 	win.loadURL('http://localhost:8080')
 	win.maximize()
@@ -37,13 +39,13 @@ export default class Application
 		return this._app
 	}
 
-	public initApplication()
+	public async initApplication()
 	{
-		app.whenReady().then(() =>
-		{
-			this._win = createWindow()
-			IPCMainManager.getInstance().init()
-		})
+		await app.whenReady()
+		await ModelManager.getInstance().init()
+		IPCMainManager.getInstance().init()
+
+		this._win = createWindow()
 
 		app.on('window-all-closed', () =>
 		{

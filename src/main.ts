@@ -13,7 +13,10 @@ if (isDev)
 
 try
 {
-	Application.getInstance().initApplication()
+	(async () =>
+	{
+		await Application.getInstance().initApplication()
+	})()
 }
 catch (err)
 {
