@@ -1,5 +1,7 @@
 import { ipcMain } from 'electron'
-import { IPCMainChannelName, IPCRendererChannelName } from './IPCChannelName'
+import { IPCMainChannelName } from './IPCChannelName'
+import ModelManager from '@main/model/ModelManager'
+import { ModelFileState } from '@views/interface/Types'
 
 export default class IPCMainManager
 {
@@ -46,7 +48,14 @@ export default class IPCMainManager
 		{
 			case (IPCMainChannelName.TEST_MAIN_CHANNEL):
 				return await this.handleTestChannel(event, ...args)
-				break
+			case (IPCMainChannelName.INIT_RENDERER_STORE):
+				return await this.handleInitStore(event, ...args)
+			case (IPCMainChannelName.FIND_MODEL_FILE):
+				return await this.handleFindModel(event, ...args)
+			case (IPCMainChannelName.UPLOAD_MODEL_FILE):
+				return await this.handleUploadModel(event, ...args)
+			case (IPCMainChannelName.REMOVE_MODEL_FILE):
+				return await this.handleRemoveModel(event, ...args)
 			default:
 				break
 		}
@@ -60,5 +69,47 @@ export default class IPCMainManager
 		console.log('hi this is test main channel', ...args)
 		await new Promise(resolve => setTimeout(() => resolve(true), 2000))
 		return 'answer'
+	}
+
+	// 初始化 vuex
+	private async handleInitStore(event: Event, ...args): Promise<Array<ModelFileState>>
+	{
+		return await ModelManager.getInstance().findAll()
+	}
+
+	/**
+	 * 查找模型文件
+	 * 
+	 * @param event - the event type
+	 * @param args - uid: string
+	 */
+	private async handleFindModel(event: Event, ...args): Promise<ModelFileState>
+	{
+		if (!args[0]) return
+		return await ModelManager.getInstance().find(args[0] as string)
+	}
+
+	/**
+	 * 上传模型文件
+	 * 
+	 * @param event - the event type
+	 * @param args - modelFile: ModelFileState
+	 */
+	private async handleUploadModel(event: Event, ...args): Promise<ModelFileState>
+	{
+		if (!args[0]) return
+		return await ModelManager.getInstance().insert(args[0] as ModelFileState)
+	}
+
+	/**
+	 * 删除模型文件
+	 * 
+	 * @param event - the event type
+	 * @param args - uid: string
+	 */
+	private async handleRemoveModel(event: Event, ...args)
+	{
+		if (!args[0]) return
+		return await ModelManager.getInstance().remove(args[0] as string)
 	}
 }

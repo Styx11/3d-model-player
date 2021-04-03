@@ -1,4 +1,5 @@
 const { ipcRenderer } = window.require('electron')
+import { ModelFileState } from '@/interface/Types';
 import { IPCMainChannelName } from '@main/ipc/IPCChannelName'
 
 export default class IPCRendererManager
@@ -33,5 +34,29 @@ export default class IPCRendererManager
 	{
 		const answer = await ipcRenderer.invoke(IPCMainChannelName.TEST_MAIN_CHANNEL, ...args)
 		console.log(answer)
+	}
+
+	// 初始化 vuex
+	public async invokeInitStore(): Promise<Array<ModelFileState>>
+	{
+		return await ipcRenderer.invoke(IPCMainChannelName.INIT_RENDERER_STORE)
+	}
+
+	// 查找模型文件
+	public async invokeFindModel(uid: string): Promise<ModelFileState>
+	{
+		return await ipcRenderer.invoke(IPCMainChannelName.FIND_MODEL_FILE, uid)
+	}
+
+	// 上传模型文件
+	public async invokeUploadModel(model: ModelFileState): Promise<ModelFileState>
+	{
+		return await ipcRenderer.invoke(IPCMainChannelName.UPLOAD_MODEL_FILE, model)
+	}
+
+	// 删除模型文件
+	public async invokeRemoveModel(uid: string)
+	{
+		return await ipcRenderer.invoke(IPCMainChannelName.REMOVE_MODEL_FILE, uid)
 	}
 }
