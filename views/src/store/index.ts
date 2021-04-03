@@ -6,13 +6,20 @@ import { ModelFile, file } from './file/index'
 // https://next.vuex.vuejs.org/guide/typescript-support.html#typing-store-property-in-vue-component
 export interface RootState
 {
+	spinning: boolean
+}
+
+export enum RootStateMutation
+{
+	SET_SPINNING = 'setSpinning'
 }
 
 // vuex 模块化 typescript 支持
 // https://blog.csdn.net/fanweilin0123/article/details/109903447
 export interface AllState extends RootState
 {
-	modelFile: ModelFile
+	spinning: boolean;
+	modelFile: ModelFile;
 }
 
 export const key: InjectionKey<Store<RootState>> = Symbol('vue-store')
@@ -30,8 +37,13 @@ export default createStore<RootState>({
 		modelFile: file,
 	},
 	state: {
+		spinning: false,
 	},
 	mutations: {
+		setSpinning(state: RootState, spinning: boolean)
+		{
+			state.spinning = spinning
+		}
 	},
 	actions: {
 	},
