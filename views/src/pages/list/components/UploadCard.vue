@@ -120,9 +120,12 @@
 			const [formRules, setFormRules] = useCollectionState<FormRules>({
 				title: [
 					{ required: true, message: '请输入模型名称', trigger: 'blur' },
-					{ min: 2, max: 10, message: '模型名称的长度应当大于 2 且小于 10', trigger: 'blur' },
+					{ min: 2, max: 8, message: '模型名称的长度应当大于 2 且小于 8', trigger: 'blur' },
 				],
-				tag: [{ required: true, message: '请输入模型分属的类别', trigger: 'blur' }],
+				tag: [
+					{ required: true, message: '请输入模型分属的类别', trigger: 'blur' },
+					{ min: 2, max: 5, message: '模型标签的长度应当大于 2 且小于 5', trigger: 'blur' },
+				],
 				desc: [{ required: true, message: '请输入模型的描述信息', trigger: 'blur' }],
 				location: [{ required: true, message: '请输入采集地点', trigger: 'blur' }],
 			})
@@ -195,7 +198,7 @@
 
 	.upload_card {
 		width: 100%;
-		height: 100%;
+		height: 424.69px;
 		position: relative;
 		background-color: rgba(222, 225, 238, 1);
 		border-radius: 2px;

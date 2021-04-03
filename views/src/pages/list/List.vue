@@ -7,21 +7,24 @@
 					<Tags :tags="tags" v-model:checkedTag="checkedTag" />
 				</header>
 				<main class="main_content">
-					<Cards />
+					<Cards :models="models" :checkedTag="checkedTag" />
 				</main>
 			</section>
+			<Spin :spinning="spinning" size="large" tip="加载中..." :style="{zIndex: spinning ? 99 : -1}" />
 		</section>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent, ref, watch, computed } from 'vue'
-	import { Button } from 'ant-design-vue'
+	import { defineComponent, computed } from 'vue'
+	import { Button, Spin } from 'ant-design-vue'
 
+	import { useState } from '../../hooks'
 	import { useStore } from '../../store'
 	import Tags from './components/Tags.vue'
 	import Cards from './components/Cards.vue'
 	import TitleBar from '@/components/TitleBar'
+	import { ModelFileState } from '@views/interface/Types'
 
 	export default defineComponent({
 		name: 'List',
@@ -29,20 +32,28 @@
 			Tags,
 			Cards,
 			Button,
+			Spin,
 			TitleBar,
 		},
 		setup()
 		{
 			const store = useStore()
+			const [checkedTag, setCheckedTag] = useState<string>('')
+			const spinning = computed(() => store.state.spinning)
+
+			// 模型文件信息
+			const models = computed<Array<ModelFileState>>(() =>
+			{
+				return store.state.modelFile.fileList
+					.sort((a, b) => b.uploadAt - a.uploadAt)
+					.filter(m => checkedTag.value === '' || checkedTag.value === m.tag)
+			})
 			const tags = computed<Array<string>>(() => [...new Set(store.state.modelFile.fileList.map(f => f.tag))])
-
-			const checkedTag = ref<string>('')
-			// const tags = ref<Array<string>>([...new Set(['sdasd', 'taasasf', 'asd', 'sdad', 'sda', 'tasasf', 'asdsd'])])
-
-			watch(checkedTag, newVal => console.log(newVal))
 
 			return {
 				tags,
+				models,
+				spinning,
 				checkedTag,
 			}
 		}
@@ -65,6 +76,7 @@
 		flex-direction: column;
 		overflow: hidden;
 		.list_main_container {
+			position: relative;
 			height: 100%;
 			flex: 1 0 auto;
 			border-top: 1px solid @BLUE0;
@@ -86,6 +98,13 @@
 					width: 100%;
 					overflow: hidden;
 				}
+			}
+			::v-deep(.ant-spin) {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				.flexContainer(column, center);
+				background: rgba(233, 246, 254, 0.5);
 			}
 		}
 	}
