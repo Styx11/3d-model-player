@@ -1541,9 +1541,9 @@
   integrity sha512-uM4mnmsIIPK/yeO+42F2RQhGUIs39K2RFmugcJANppXe6J1nvH87PvzPZYpza7Xhhs8Yn9yIAVdLZ84z61+0xQ==
 
 "@types/node@^14.6.2":
-  version "14.14.35"
-  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.14.35.tgz?cache=0&sync_timestamp=1615834840617&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.14.35.tgz#42c953a4e2b18ab931f72477e7012172f4ffa313"
-  integrity sha1-QslTpOKxirkx9yR35wEhcvT/oxM=
+  version "14.14.37"
+  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.14.37.tgz?cache=0&sync_timestamp=1616803582959&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.14.37.tgz#a3dd8da4eb84a996c36e331df98d82abd76b516e"
+  integrity sha1-o92NpOuEqZbDbjMd+Y2Cq9drUW4=
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -2598,9 +2598,9 @@ boolbase@~1.0.0:
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
 boolean@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.npm.taobao.org/boolean/download/boolean-3.0.2.tgz#df1baa18b6a2b0e70840475e1d93ec8fe75b2570"
-  integrity sha1-3xuqGLaisOcIQEdeHZPsj+dbJXA=
+  version "3.0.3"
+  resolved "https://registry.npm.taobao.org/boolean/download/boolean-3.0.3.tgz#0fee0c9813b66bef25a8a6a904bb46736d05f024"
+  integrity sha1-D+4MmBO2a+8lqKapBLtGc20F8CQ=
 
 boom@2.x.x:
   version "2.10.1"
@@ -3876,7 +3876,7 @@ electron-to-chromium@^1.3.390:
 
 electron@^12.0.2:
   version "12.0.2"
-  resolved "https://registry.npm.taobao.org/electron/download/electron-12.0.2.tgz?cache=0&sync_timestamp=1616549421821&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Felectron%2Fdownload%2Felectron-12.0.2.tgz#d92be205f1937627bd6718aad44ac161382b4c2d"
+  resolved "https://registry.npm.taobao.org/electron/download/electron-12.0.2.tgz#d92be205f1937627bd6718aad44ac161382b4c2d"
   integrity sha1-2SviBfGTdie9Zxiq1ErBYTgrTC0=
   dependencies:
     "@electron/get" "^1.0.1"
@@ -8745,7 +8745,7 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
 
 roarr@^2.15.3:
   version "2.15.4"
-  resolved "https://registry.npm.taobao.org/roarr/download/roarr-2.15.4.tgz#f5fe795b7b838ccfe35dc608e0282b9eba2e7afd"
+  resolved "https://registry.npm.taobao.org/roarr/download/roarr-2.15.4.tgz?cache=0&sync_timestamp=1616644625877&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Froarr%2Fdownload%2Froarr-2.15.4.tgz#f5fe795b7b838ccfe35dc608e0282b9eba2e7afd"
   integrity sha1-9f55W3uDjM/jXcYI4Cgrnrouev0=
   dependencies:
     boolean "^3.0.1"

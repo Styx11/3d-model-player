@@ -13,7 +13,7 @@ module.exports = {
 		filename: '[name].js',
 		publicPath: '',
 	},
-	target: 'web',
+	target: 'electron-renderer',
 	module: {
 		rules: [
 			{
