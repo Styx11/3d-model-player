@@ -4,9 +4,10 @@ import { reactive, toRaw } from 'vue'
 import { Store } from 'vuex'
 
 import { AllState } from '../store'
-import { IModelFormState } from '../interface/Types'
+import { IModelFormState, ModelFileState } from '../interface/Types'
 import { UnwrapNestedRefs } from './index'
 import { ModelFileMutation } from '../store/file'
+import IPCRendererManager from '@/ipc/IPCRendererManager'
 
 /* 
 	表单中模型文件上传的思路是：
@@ -65,6 +66,7 @@ export const useUploadConfirm = (store: Store<AllState>): (fileState: IModelForm
 {
 	return async (fileState: IModelFormState) =>
 	{
+
 		if (!_fileList.length)
 		{
 			message.error({ content: '请上传一个模型文件！', key: 'no_file' });
@@ -72,7 +74,22 @@ export const useUploadConfirm = (store: Store<AllState>): (fileState: IModelForm
 		}
 		await new Promise((resolve) => setTimeout(() => resolve(true), 2000))
 
-		store.commit(ModelFileMutation.UPLOAD_FILE, Object.assign(toRaw(_fileList[0]), toRaw(fileState)))
+		const modelFile = _fileList.map<ModelFileState>(rawFile => ({
+			name: rawFile.name,
+			uid: rawFile.uid,
+			size: rawFile.size,
+			path: (rawFile as any).path,
+			lastModified: rawFile.lastModified,
+			title: fileState.title,
+			desc: fileState.desc,
+			location: fileState.location,
+			tag: fileState.tag,
+			uploadAt: Date.now(),
+		}))[0]
+
+		const model = await IPCRendererManager.getInstance().invokeUploadModel(modelFile)
+		store.commit(ModelFileMutation.UPLOAD_FILE, model)
+
 		_fileList.splice(0, _fileList.length)
 		return true
 	}
@@ -84,6 +101,7 @@ export const useUploadRemove = (store: Store<AllState>): (uid: string) => Promis
 	return async (uid: string) =>
 	{
 		await new Promise((resolve) => setTimeout(() => resolve(true), 2000))
+		await IPCRendererManager.getInstance().invokeRemoveModel(uid)
 		store.commit(ModelFileMutation.REMOVE_FILE, uid)
 		return true
 	}

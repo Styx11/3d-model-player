@@ -10,6 +10,12 @@ export interface IModelFormState
 }
 
 // 模型文件信息
-export interface ModelFileState extends VcFile, IModelFormState
+export interface ModelFileState extends IModelFormState
 {
+	uid: string;
+	name: string;         // name 带有文件名及后缀
+	path: string;
+	size: number;
+	uploadAt: number;
+	lastModified: number;
 }
