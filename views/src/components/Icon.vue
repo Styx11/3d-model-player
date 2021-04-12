@@ -93,7 +93,7 @@
 			const onUnhover = () => { isHover.value = false; isActive.value = false }
 
 			const onActive = () => isActive.value = true;
-			const onUnactive = () => { isActive.value = false; emit('click') }
+			const onUnactive = () => isActive.value = false;
 
 			return {
 				svgClass,

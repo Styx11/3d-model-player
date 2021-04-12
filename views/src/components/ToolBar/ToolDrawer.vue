@@ -8,7 +8,31 @@
 				</section>
 			</header>
 			<section class="drawer_body">
-				<div class="body_empty_message">
+				<div class="body_tree" v-if="treeData && treeData.length">
+					<Tree :tree-data="treeData" blockNode :selectable="false" defaultExpandAll>
+						<template #title="{title, isLeaf, key, expanded, color}">
+							<Icon
+								v-if="!isLeaf"
+								:name="`ic-${key}-${expanded? 'selected' :'regular'}`"
+								:width="26"
+								:height="26"
+							/>
+							<Badge v-else :color="color" />
+							<span class="tree_title">{{title}}</span>
+							<div class="tree_icons" v-if="isLeaf">
+								<Icon
+									name="ic-trash"
+									:width="18"
+									:height="18"
+									@click="handleEntityDel(key)"
+									:interactive="true"
+								/>
+								<EyeFilled :style="{cursor: 'pointer'}" @click="handleEntityCheck(key)" />
+							</div>
+						</template>
+					</Tree>
+				</div>
+				<div class="body_empty_message" v-else>
 					暂无数据
 					<br />点击模型开始测量
 				</div>
@@ -21,28 +45,107 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, ref } from 'vue'
-	import { Drawer } from 'ant-design-vue'
+	import { defineComponent, ref, reactive } from 'vue'
+	import { Tree, Badge } from 'ant-design-vue'
+	import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 	import { RightOutlined, EyeFilled } from '@ant-design/icons-vue'
+
+	const rawTreeData: TreeDataItem[] = [
+		{
+			title: '标注工具',
+			key: 'notation',
+			slots: { title: 'title' },
+			children: [
+				{
+					title: '标注 1-0',
+					key: '0-0-0',
+					color: 'red',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+				{
+					title: 'Earent 1-1',
+					key: '0-0-1',
+					color: 'orange',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+			],
+		},
+		{
+			title: '距离工具',
+			key: 'line',
+			slots: { title: 'title' },
+			children: [
+				{
+					title: '测量 1-0',
+					key: 'qwer',
+					color: 'yellow',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+				{
+					title: 'Earent 1-1',
+					key: '0wer',
+					color: 'green',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+			],
+		},
+		{
+			title: '面积工具',
+			key: 'area',
+			slots: { title: 'title' },
+			children: [
+				{
+					title: '面积 1-0',
+					key: 'qwesr',
+					color: 'blue',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+				{
+					title: 'Earent 1-1',
+					key: '0wedr',
+					color: 'purple',
+					slots: { title: 'title' },
+					isLeaf: true
+				},
+			],
+		},
+	];
 
 	export default defineComponent({
 		name: 'ToolDrawer',
 		components: {
 			RightOutlined,
 			EyeFilled,
-			Drawer,
+			Badge,
+			Tree,
 		},
 		props: {
 
 		},
 		setup(props)
 		{
-			const drawerVisible = ref<boolean>(false)
+			const treeData = reactive<TreeDataItem[]>(rawTreeData)
+			const colors = reactive<string[]>(['red', 'orange', 'yellow', 'green', 'blue', 'purple'])
+
+			const drawerVisible = ref<boolean>(!!(treeData && treeData.length))
 			const toggleDrawerVisible = () => drawerVisible.value = !drawerVisible.value
 
+			const handleEntityDel = (key: number) => console.log('delete entity', key)
+			const handleEntityCheck = (key: number) => console.log('check entity', key)
+
 			return {
+				colors,
+				treeData,
 				drawerVisible,
 				toggleDrawerVisible,
+
+				handleEntityDel,
+				handleEntityCheck,
 			}
 		}
 	})
@@ -59,6 +162,7 @@
 
 	.tool_drawer {
 		.noselect();
+		z-index: 99;
 		.flexContainer(row, center);
 		position: fixed;
 		top: @TRAFFIC_LIGHT_HEIGHT;
@@ -120,12 +224,80 @@
 				}
 			}
 			.drawer_body {
+				width: 100%;
+				height: 100%;
+				flex: 1 1 auto;
+				padding: 6px 8px;
+				overflow: auto;
+				.scrollBar(8px);
 				.body_empty_message {
 					position: relative;
 					.label(14px, rgba(255, 255, 255, 0.6));
 					text-align: center;
 					top: 106px;
 					padding: 0 15px;
+				}
+				.body_tree {
+					width: 100%;
+					height: 100%;
+
+					.tree_title {
+						margin-left: 8px;
+						flex: 1 1 auto;
+					}
+
+					.tree_icons {
+						display: inline-flex;
+						height: 100%;
+						width: 40px;
+						.flexContainer(row, space-between);
+					}
+
+					::v-deep(.ant-tree) {
+						color: @WHITE_COLOR;
+						cursor: pointer;
+
+						.ant-tree-switcher {
+							display: inline-block;
+
+							.ant-tree-switcher-icon {
+								margin-top: 8px;
+							}
+						}
+
+						.ant-tree-node-content-wrapper {
+							height: 30px;
+							color: @WHITE_COLOR;
+							position: relative;
+							.label(14px, @WHITE_COLOR);
+
+							&:hover {
+								background: rgba(34, 52, 71, 0.9);
+							}
+
+							svg:hover {
+								path {
+									fill: @PRIMARY_COlOR;
+								}
+							}
+
+							.ant-tree-title {
+								height: 100%;
+								.flexContainer(row);
+
+								.ant-badge {
+									width: 16px;
+									height: 16px;
+									.flexContainer(column, center);
+
+									.ant-badge-status-dot {
+										width: 8px;
+										height: 8px;
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}

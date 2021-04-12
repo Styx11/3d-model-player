@@ -1,15 +1,40 @@
 <template>
 	<div class="toolBar">
-		<div class="tool_item">新</div>
-		<div class="tool_item">新</div>
-		<div class="tool_item">新</div>
+		<div
+			v-for="t in tools"
+			:key="t"
+			:class="['tool_item', selected && selected === t ? 'selected_tool' : '']"
+			@click="selectTool(t)"
+		>
+			<Icon :name="`ic-${t}`" :width="20" :height="20" />
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent } from 'vue'
+	import { defineComponent, reactive, ref } from 'vue'
+
+	import { useState } from '../../hooks'
+
 	export default defineComponent({
 		name: 'Toolbar',
+		components: {
+		},
+		props: {
+		},
+		setup(props)
+		{
+			const [selected, setSelected] = useState<string>('')
+			const tools = reactive(['note', 'line', 'area'])
+
+			const selectTool = (t: string) => selected.value && selected.value === t ? setSelected('') : setSelected(t)
+
+			return {
+				tools,
+				selected,
+				selectTool,
+			}
+		},
 	})
 </script>
 
@@ -28,13 +53,25 @@
 		border-right: 1px solid @BLUE0;
 		border-top: 1px solid @BLUE0;
 		.flexContainer(column, flex-start);
+
 		.tool_item {
 			display: inline-block;
+			cursor: pointer;
 			width: 28px;
 			height: 28px;
 			margin: 8px 0;
 			color: @WHITE_COLOR;
+			transition: all 0.2s ease;
+			border-radius: 2px;
 			.flexContainer(row, center);
+
+			&:hover {
+				background: rgba(34, 52, 71, 1);
+			}
+
+			&.selected_tool {
+				background: @PRIMARY_COlOR !important;
+			}
 		}
 	}
 </style>
