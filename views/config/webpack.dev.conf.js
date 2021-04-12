@@ -20,48 +20,15 @@ module.exports = merge(baseConfig, {
 	devtool: 'cheap-module-eval-source-map',
 
 	devServer: {
-		clientLogLevel: 'warning',
-		historyApiFallback: {
-			rewrites: [
-				{ from: /.*/, to: path.posix.join('/', 'index.html') },
-			],
-		},
-		hot: false,
-		contentBase: false, // since we use CopyWebpackPlugin.
+		contentBase: path.join('../dist/'),
 		compress: true,
-		host: process.env.HOST || HOST,
-		port: (process.env.PORT && Number(process.env.PORT)) || PORT,
-		overlay: { warnings: false, errors: true },
-		publicPath: '/',
-		proxy: {},
-		open: true,
-		// quiet:c true, // necessary for FriendlyErrorsPlugin
-		watchOptions: {
-			poll: false,
-		},
-		proxy: {
-			'*': {
-				bypass: (req, res, proxyOptions) =>
-				{
-					const reqObj = URI.parse(req.url)
-					if (reqObj.path.endsWith('/auth') && req.query && req.query.code)
-					{
-						req.headers.accept = 'text/html';
-					}
-					return req.url
-				},
-			},
-		},
-		headers: {
-			"Access-Control-Allow-Origin": "http://test.account.meshkit.cn",
-			"Access-Control-Allow-Credentials": "true",
-			"Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-			"Access-Control-Allow-Headers": "Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Request-Headers, Content-Type, Accept, x-mesh-access-token",
-		}
+		historyApiFallback: true,
+		hot: true,
+		port: 8080
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
-			title: '日志客户端',
+			title: '三维模型播放器',
 			publicPath: './',
 			filename: resolve('dist/index.html'),
 			template: resolve('public/template.html'),

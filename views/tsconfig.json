@@ -18,6 +18,9 @@
 			"@main/*": [
 				"../src/*"
 			],
+			"cesium/*": [
+				"../node_modules/cesium/Source/*"
+			],
 			"@/*": [
 				"./src/*"
 			]

@@ -13,6 +13,7 @@
 		"@babel/node": "^7.8.7",
 		"@babel/plugin-transform-runtime": "^7.12.1",
 		"@babel/preset-env": "^7.9.0",
+		"@types/cesium": "^1.67.13",
 		"@types/webpack-env": "^1.15.3",
 		"@typescript-eslint/eslint-plugin": "^4.6.1",
 		"@typescript-eslint/parser": "^4.6.1",
@@ -30,6 +31,7 @@
 		"eslint": "^7.17.0",
 		"eslint-webpack-plugin": "^2.2.0",
 		"html-webpack-plugin": "4.5.0",
+		"html-webpack-tags-plugin": "^3.0.0",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "26.0.0",
 		"jest-css-modules-transform": "^4.0.2",
@@ -55,6 +57,7 @@
 	"dependencies": {
 		"@ant-design/icons-vue": "^5.1.5",
 		"ant-design-vue": "^2.0.0",
+		"cesium": "^1.80.0",
 		"crypto-js": "^4.0.0",
 		"dayjs": "^1.10.4",
 		"vue": "3.0.5",

@@ -3,6 +3,10 @@ const resolve = utils.resolve;
 const { VueLoaderPlugin } = require('vue-loader');
 const tsImportPluginFactory = require('ts-import-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackTagsPlugin = require("html-webpack-tags-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const DEV = process.env.NODE_ENV === "development";
 
 module.exports = {
 	entry: {
@@ -12,6 +16,15 @@ module.exports = {
 		path: resolve('dist/'),
 		filename: '[name].js',
 		publicPath: '',
+		sourcePrefix: '',
+	},
+	amd: {
+		// Enable webpack-friendly use of require in Cesium
+		toUrlUndefined: true
+	},
+	node: {
+		// Resolve node module use of fs
+		fs: 'empty'
 	},
 	target: 'electron-renderer',
 	module: {
@@ -116,5 +129,30 @@ module.exports = {
 			filename: 'static/css/[name].[contenthash].css',
 		}),
 
+		new HtmlWebpackTagsPlugin({
+			append: false,
+			scripts: ["static/cesium/Cesium.js"],
+			links: ["static/cesium/Widgets/widgets.css"],
+		}),
+		// Copy Cesium Assets, Widgets, and Workers to a static directory
+		new CopyWebpackPlugin({
+			patterns: [
+				{
+					from: resolve(`node_modules/cesium/Build/Cesium${!DEV ? "" : "Unminified"}`),
+					to: "static/cesium",
+					globOptions: {
+						writeToDisk: true,
+					}
+				},
+				{
+					from: resolve(`src/static/image`),
+					to: "static/images",
+					globOptions: {
+						writeToDisk: true,
+					}
+				},
+			]
+		}
+		),
 	]
 }
