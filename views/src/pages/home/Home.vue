@@ -4,16 +4,17 @@
 		<main class="container_main">
 			<ToolBar />
 			<ToolDrawer />
-			<div>测试文本</div>
+			<Model />
 		</main>
 	</div>
 </template>
 
 <script lang='ts'>
-	import { defineComponent } from 'vue'
+	import { defineComponent, defineAsyncComponent } from 'vue'
 	import TitleBar from '@/components/TitleBar'
 	import ToolBar from '@/components/ToolBar'
 	import ToolDrawer from '@/components/ToolBar/ToolDrawer'
+	import { Spin } from 'ant-design-vue'
 
 	export default defineComponent({
 		name: 'project-home',
@@ -21,6 +22,11 @@
 			TitleBar,
 			ToolBar,
 			ToolDrawer,
+			Model: defineAsyncComponent({
+				loader: () => import('./components/Model.vue'),
+				loadingComponent: Spin,
+				delay: 100,
+			})
 		},
 		computed: {
 		},
@@ -47,6 +53,13 @@
 			position: relative;
 			.flexContainer(row);
 			flex: 1 0 auto;
+		}
+		::v-deep(.ant-spin) {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			.flexContainer(column, center);
+			background: rgba(233, 246, 254, 0.5);
 		}
 	}
 </style>
