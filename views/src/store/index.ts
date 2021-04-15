@@ -1,6 +1,7 @@
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import { ModelFile, file } from './file/index'
+import { CesiumEntity, entity } from './entity/index'
 
 // typing vuex
 // https://next.vuex.vuejs.org/guide/typescript-support.html#typing-store-property-in-vue-component
@@ -20,6 +21,7 @@ export interface AllState extends RootState
 {
 	spinning: boolean;
 	modelFile: ModelFile;
+	cesiumEntity: CesiumEntity;
 }
 
 export const key: InjectionKey<Store<RootState>> = Symbol('vue-store')
@@ -35,6 +37,7 @@ export function useStore()
 export default createStore<RootState>({
 	modules: {
 		modelFile: file,
+		cesiumEntity: entity,
 	},
 	state: {
 		spinning: false,

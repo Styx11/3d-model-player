@@ -1,4 +1,5 @@
-import { VcFile } from 'ant-design-vue/lib/upload/interface'
+import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
+import { PositionMaker } from '../hooks/cesium'
 
 // 模型上传表单
 export interface IModelFormState
@@ -18,4 +19,59 @@ export interface ModelFileState extends IModelFormState
 	size: number;
 	uploadAt: number;
 	lastModified: number;
+}
+
+// 测量工具类型
+export enum ToolType
+{
+	NOTATION = 'notation',
+	LINE = 'line',
+	AREA = 'area',
+}
+
+// 测量工具名称
+export enum ToolTitle
+{
+	NOTATION = '标注工具',
+	LINE = '距离工具',
+	AREA = '面积工具',
+}
+
+// 实体标记色
+export enum EntityColor
+{
+	RED = 'red',
+	ORANGE = 'orange',
+	YELLOW = 'yellow',
+	GREEN = 'green',
+	BLUE = 'blue',
+	PURPLE = 'purple',
+}
+
+export const EntityTextColor =
+{
+	red: '#f03048',
+	orange: '#fe8001',
+	yellow: '#fee144',
+	green: '#11b00e',
+	blue: '#007aff',
+	purple: '#983ff3',
+}
+
+// 实体树形数据（用于 Tree 组件和 Vuex）
+export interface EntityTreeItem extends Omit<TreeDataItem, 'children' | 'key' | 'title'>
+{
+	key: ToolType;
+	title: ToolTitle;
+	children: EntityTreeChild[];
+}
+
+export interface EntityTreeChild extends Omit<TreeDataItem, 'key'>
+{
+	key: string;
+	desc?: string;
+	title: string;
+	color: EntityColor;
+	type: ToolType;
+	position: PositionMaker;
 }
