@@ -10,24 +10,33 @@
 			<section class="drawer_body">
 				<div class="body_tree" v-if="treeData && treeData.length">
 					<Tree :tree-data="treeData" blockNode :selectable="false" defaultExpandAll>
-						<template #title="{title, isLeaf, key, expanded, color}">
+						<template #title="titleData">
 							<Icon
-								v-if="!isLeaf"
-								:name="`ic-${key}-${expanded? 'selected' :'regular'}`"
+								v-if="!titleData.isLeaf"
+								:name="`ic-${titleData.key}-${titleData.expanded? 'selected' :'regular'}`"
 								:width="26"
 								:height="26"
 							/>
-							<Badge v-else :color="color" />
-							<span class="tree_title">{{title}}</span>
-							<div class="tree_icons" v-if="isLeaf">
+							<Badge v-else :color="titleData.color" />
+							<span class="tree_title">{{titleData.title}}</span>
+							<div class="tree_icons" v-if="titleData.isLeaf">
 								<Icon
 									name="ic-trash"
 									:width="18"
 									:height="18"
-									@click="handleEntityDel(key)"
+									@click="handleEntityDel(titleData.type, titleData.key)"
 									:interactive="true"
 								/>
-								<EyeFilled :style="{cursor: 'pointer'}" @click="handleEntityCheck(key)" />
+								<EyeFilled
+									:style="{cursor: 'pointer'}"
+									@click.prevent="handleEntityCheck(titleData)"
+									v-if="selectedEntity.key !== titleData.key"
+								/>
+								<EyeInvisibleOutlined
+									v-else
+									:style="{cursor: 'pointer'}"
+									@click.prevent="handleEntityCheck(titleData, true)"
+								/>
 							</div>
 						</template>
 					</Tree>
@@ -41,14 +50,23 @@
 		<div class="drawer_handler" :class="{ expanded: drawerVisible }" @click="toggleDrawerVisible">
 			<RightOutlined />
 		</div>
+		<div class="drawer_info" v-if="selectedEntity.key">
+			<EntityInfo />
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent, ref, reactive } from 'vue'
+	import { defineComponent, ref, reactive, computed, watch } from 'vue'
 	import { Tree, Badge } from 'ant-design-vue'
 	import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
-	import { RightOutlined, EyeFilled } from '@ant-design/icons-vue'
+	import { RightOutlined, EyeFilled, EyeInvisibleOutlined } from '@ant-design/icons-vue'
+
+	import { useStore } from '../../store'
+	import EntityInfo from './EntityInfo.vue'
+	import { updatePoint, removeEntity } from '../../hooks/cesium'
+	import { CesiumEntityMutation } from '../../store/entity'
+	import { EntityColor, EntityTreeChild, ToolType } from '../../interface/Types'
 
 	const rawTreeData: TreeDataItem[] = [
 		{
@@ -120,6 +138,8 @@
 		name: 'ToolDrawer',
 		components: {
 			RightOutlined,
+			EyeInvisibleOutlined,
+			EntityInfo,
 			EyeFilled,
 			Badge,
 			Tree,
@@ -129,19 +149,42 @@
 		},
 		setup(props)
 		{
-			const treeData = reactive<TreeDataItem[]>(rawTreeData)
+			const store = useStore()
+			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
+			const treeData = computed(() => store.state.cesiumEntity.entityList)
 			const colors = reactive<string[]>(['red', 'orange', 'yellow', 'green', 'blue', 'purple'])
 
-			const drawerVisible = ref<boolean>(!!(treeData && treeData.length))
+			const drawerVisible = ref<boolean>(!!(treeData.value && treeData.value.length))
 			const toggleDrawerVisible = () => drawerVisible.value = !drawerVisible.value
 
-			const handleEntityDel = (key: number) => console.log('delete entity', key)
-			const handleEntityCheck = (key: number) => console.log('check entity', key)
+			const handleEntityDel = (type: ToolType, key: string) =>
+			{
+				store.commit(CesiumEntityMutation.REMOVE_ENTITY, { type, key })
+				removeEntity(key)
+			}
+			const handleEntityCheck = (titleData: EntityTreeChild, uncheck?: boolean) =>
+			{
+				if (!uncheck)
+				{
+					if (selectedEntity.value.key)
+					{
+						updatePoint(selectedEntity.value.key, selectedEntity.value.color)
+					}
+					store.commit(CesiumEntityMutation.SEL_ENTITY, titleData)
+					updatePoint(titleData.key, titleData.color, true)
+				}
+				else
+				{
+					store.commit(CesiumEntityMutation.UNSEL_ENTITY)
+					updatePoint(titleData.key, titleData.color, false)
+				}
+			}
 
 			return {
 				colors,
 				treeData,
 				drawerVisible,
+				selectedEntity,
 				toggleDrawerVisible,
 
 				handleEntityDel,
@@ -172,6 +215,12 @@
 		transition: all @ease-base-out @animation-duration-slow;
 		&.expanded {
 			left: @tool-bar-width;
+		}
+		.drawer_info {
+			transition: all @ease-base-out @animation-duration-slow;
+			position: absolute;
+			top: @drawer-handler-width;
+			left: @drawer-handler-width + @drawer-content-width;
 		}
 		.drawer_handler {
 			.flexContainer(row);

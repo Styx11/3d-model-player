@@ -12,9 +12,11 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, reactive, ref } from 'vue'
+	import { defineComponent, reactive, computed } from 'vue'
 
-	import { useState } from '../../hooks'
+	import { useStore } from '../../store'
+	import { CesiumEntityMutation } from '../../store/entity'
+	import { ToolType } from '../../interface/Types'
 
 	export default defineComponent({
 		name: 'Toolbar',
@@ -24,10 +26,17 @@
 		},
 		setup(props)
 		{
-			const [selected, setSelected] = useState<string>('')
-			const tools = reactive(['note', 'line', 'area'])
+			const store = useStore()
 
-			const selectTool = (t: string) => selected.value && selected.value === t ? setSelected('') : setSelected(t)
+			// 选中的工具
+			const selected = computed(() => store.state.cesiumEntity.selectedTool)
+
+			// 工具名列表
+			const tools = computed(() => store.state.cesiumEntity.entityList.map(e => e.key))
+
+			// 选择工具
+			const setSelected = (t: ToolType | '') => store.commit(CesiumEntityMutation.SEL_TOOL, t)
+			const selectTool = (t: ToolType) => selected.value && selected.value === t ? setSelected('') : setSelected(t)
 
 			return {
 				tools,
