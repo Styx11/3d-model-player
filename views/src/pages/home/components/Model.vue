@@ -1,6 +1,6 @@
 <template>
 	<div class="model_container">
-		<main class="model_main" id="model_main" ref="viewerRef"></main>
+		<main :class="['model_main', selected ? 'tool_selected' : '']" id="model_main" ref="viewerRef"></main>
 		<section
 			class="model_position"
 		>WGS84 E: {{position.y.toFixed(5)}} N: {{position.x.toFixed(5)}} 高度: {{position.z.toFixed(3)}} m</section>
@@ -8,10 +8,11 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, onMounted, onBeforeUnmount, ref, reactive, watch } from 'vue'
+	import { defineComponent, onMounted, onBeforeUnmount, ref, reactive, computed } from 'vue'
 	import * as Cesium from 'cesium'
 
-	import { initViewer, initTileset, initHandler, zoomToTileset, usePosition, HEIGHT_OFFSET, PositionMaker } from '../../../hooks/cesium'
+	import { useStore } from '../../../store/index'
+	import { initViewer, initTileset, initHandler, zoomToTileset, usePosition, useClick, HEIGHT_OFFSET, PositionMaker } from '../../../hooks/cesium'
 
 	Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiZjc1MGI5NC0wYTcyLTQ3YWYtYTNiMi03YmU5MjQ0ZTE1MDkiLCJpZCI6NDk1NjIsImlhdCI6MTYxNzQxNjIzMH0.OKpUIs85S_LatHupyCtso-ZtcpMjdrYVmSf61N93Ihg'
 
@@ -26,6 +27,9 @@
 			let viewer: Cesium.Viewer = null
 			let handler: Cesium.ScreenSpaceEventHandler = null
 
+			const store = useStore()
+			// 选中的工具
+			const selected = computed(() => store.state.cesiumEntity.selectedTool)
 			const position = reactive<PositionMaker>({
 				x: 0,
 				y: 0,
@@ -37,8 +41,8 @@
 			{
 
 				viewer = initViewer(viewerRef)
-				tileset = initTileset(viewer)
-				handler = initHandler(viewer)
+				tileset = initTileset()
+				handler = initHandler()
 
 				tileset.readyPromise.then(tileset =>
 				{
@@ -57,9 +61,10 @@
 					viewer.camera.viewBoundingSphere(boundingSphere, new Cesium.HeadingPitchRange(0, -2.0, 0));
 
 					// 绑定事件
-					handler.setInputAction(usePosition(viewer, position), Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+					handler.setInputAction(usePosition(position), Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+					handler.setInputAction(useClick(position, store), Cesium.ScreenSpaceEventType.LEFT_CLICK)
 
-					zoomToTileset(viewer, tileset)
+					zoomToTileset(tileset)
 				})
 			})
 
@@ -71,6 +76,7 @@
 			return {
 				viewerRef,
 				position,
+				selected,
 			}
 		},
 	})
@@ -124,6 +130,13 @@
 				cursor: grabbing;
 			}
 
+			&.tool_selected {
+				cursor: crosshair;
+				&:active {
+					cursor: crosshair;
+				}
+			}
+
 			canvas {
 				max-width: 100%;
 				max-height: 100%;
@@ -132,6 +145,15 @@
 			::v-deep(.cesium-viewer-bottom) {
 				display: none !important;
 				position: absolute;
+			}
+
+			::v-deep(.cesium-infoBox-title) {
+				.ellipsis();
+				.flexContainer(row, center);
+			}
+
+			::v-deep(.cesium-infoBox-close) {
+				.flexContainer(row, center, center);
 			}
 		}
 	}
