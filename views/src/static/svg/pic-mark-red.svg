@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="19" height="37" viewBox="0 0 19 37">
+    <defs>
+        <filter id="jqu4jricyb" width="266.7%" height="126.3%" x="-83.3%" y="-13.2%" filterUnits="objectBoundingBox">
+            <feGaussianBlur in="SourceAlpha" result="shadowBlurInner1" stdDeviation="1"/>
+            <feOffset dx="-1" dy="3" in="shadowBlurInner1" result="shadowOffsetInner1"/>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" k2="-1" k3="1" operator="arithmetic" result="shadowInnerInner1"/>
+            <feColorMatrix in="shadowInnerInner1" values="0 0 0 0 0.200549139 0 0 0 0 0.0620754615 0 0 0 0 0.0620754615 0 0 0 0.199847028 0"/>
+        </filter>
+        <filter id="w6908v8v8e" width="106.7%" height="106.7%" x="-3.3%" y="-3.3%" filterUnits="objectBoundingBox">
+            <feGaussianBlur in="SourceAlpha" result="shadowBlurInner1" stdDeviation=".5"/>
+            <feOffset in="shadowBlurInner1" result="shadowOffsetInner1"/>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" k2="-1" k3="1" operator="arithmetic" result="shadowInnerInner1"/>
+            <feColorMatrix in="shadowInnerInner1" values="0 0 0 0 1 0 0 0 0 0.584674874 0 0 0 0 0.637282723 0 0 0 1 0"/>
+        </filter>
+        <filter id="vouh5q48sf" width="354.1%" height="281.5%" x="-127.1%" y="-90.8%" filterUnits="objectBoundingBox">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+        </filter>
+        <linearGradient id="rktey2fwld" x1="20.537%" x2="68.117%" y1="14.172%" y2="82.425%">
+            <stop offset="0%" stop-color="#FF6D80"/>
+            <stop offset="100%" stop-color="#D13549"/>
+        </linearGradient>
+        <circle id="v8u12v3wuc" cx="7.5" cy="7.5" r="7.5"/>
+        <path id="6xyo4l82ca" d="M8 15h3v17.5c0 .828-.672 1.5-1.5 1.5S8 33.328 8 32.5V15z"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <g transform="translate(-417 -156) translate(417 156)">
+                <ellipse cx="9.5" cy="34.5" fill="#000" fill-opacity=".2" rx="6.5" ry="2.5"/>
+                <g>
+                    <use fill="#FFF" xlink:href="#6xyo4l82ca"/>
+                    <use fill="#000" filter="url(#jqu4jricyb)" xlink:href="#6xyo4l82ca"/>
+                </g>
+                <g transform="translate(2 2)">
+                    <mask id="yjxcgx44hg" fill="#fff">
+                        <use xlink:href="#v8u12v3wuc"/>
+                    </mask>
+                    <g>
+                        <use fill="url(#rktey2fwld)" xlink:href="#v8u12v3wuc"/>
+                        <use fill="#000" filter="url(#w6908v8v8e)" xlink:href="#v8u12v3wuc"/>
+                    </g>
+                    <ellipse cx="4.194" cy="3.194" fill="#CFEAFF" fill-opacity=".52" filter="url(#vouh5q48sf)" mask="url(#yjxcgx44hg)" rx="2.361" ry="3.306" transform="rotate(41 4.194 3.194)"/>
+                    <ellipse cx="3.688" cy="2.938" fill="#FFF" fill-opacity=".2" mask="url(#yjxcgx44hg)" rx="2" ry="1.5" transform="rotate(-42 3.688 2.938)"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

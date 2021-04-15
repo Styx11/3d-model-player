@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="19" height="37" viewBox="0 0 19 37">
+    <defs>
+        <filter id="asbt0r6w4b" width="233.3%" height="121.1%" x="-66.7%" y="-10.5%" filterUnits="objectBoundingBox">
+            <feGaussianBlur in="SourceAlpha" result="shadowBlurInner1" stdDeviation="1"/>
+            <feOffset dx="-1" dy="2" in="shadowBlurInner1" result="shadowOffsetInner1"/>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" k2="-1" k3="1" operator="arithmetic" result="shadowInnerInner1"/>
+            <feColorMatrix in="shadowInnerInner1" values="0 0 0 0 0.0448678026 0 0 0 0 0.181340718 0 0 0 0 0.329738451 0 0 0 0.198699738 0"/>
+        </filter>
+        <filter id="0r462r1nte" width="354.1%" height="281.5%" x="-127.1%" y="-90.8%" filterUnits="objectBoundingBox">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+        </filter>
+        <linearGradient id="1ldgrdy9cd" x1="22.564%" x2="72.13%" y1="16.444%" y2="79.763%">
+            <stop offset="0%" stop-color="#2195EF"/>
+            <stop offset="100%" stop-color="#0067D6"/>
+        </linearGradient>
+        <circle id="8p72livhsc" cx="7.5" cy="7.5" r="7.5"/>
+        <path id="ihyck5psga" d="M8 15h3v17.5c0 .828-.672 1.5-1.5 1.5S8 33.328 8 32.5V15z"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <g transform="translate(-491 -201) translate(491 201)">
+                <ellipse cx="9.5" cy="34.5" fill="#000" fill-opacity=".2" rx="6.5" ry="2.5"/>
+                <g>
+                    <use fill="#FFF" xlink:href="#ihyck5psga"/>
+                    <use fill="#000" filter="url(#asbt0r6w4b)" xlink:href="#ihyck5psga"/>
+                </g>
+                <g transform="translate(2 2)">
+                    <mask id="avxfjnhuzf" fill="#fff">
+                        <use xlink:href="#8p72livhsc"/>
+                    </mask>
+                    <use fill="url(#1ldgrdy9cd)" xlink:href="#8p72livhsc"/>
+                    <ellipse cx="4.194" cy="3.194" fill="#CFEAFF" fill-opacity=".52" filter="url(#0r462r1nte)" mask="url(#avxfjnhuzf)" rx="2.361" ry="3.306" transform="rotate(41 4.194 3.194)"/>
+                    <ellipse cx="3.688" cy="2.938" fill="#FFF" fill-opacity=".2" mask="url(#avxfjnhuzf)" rx="2" ry="1.5" transform="rotate(-42 3.688 2.938)"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
