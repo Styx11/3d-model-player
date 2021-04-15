@@ -116,6 +116,7 @@ module.exports = {
 			vue: '@vue/runtime-dom',
 			'@': resolve('src'),
 			'@main': resolve('../src'),
+			'@views': resolve('src'),
 		},
 		// Add `.ts` and `.tsx` as a resolvable extension.
 		extensions: ['.ts', 'd.ts', '.tsx', '.js', '.vue'],
@@ -145,8 +146,8 @@ module.exports = {
 					}
 				},
 				{
-					from: resolve(`src/static/image`),
-					to: "static/images",
+					from: resolve(`src/static`),
+					to: "static",
 					globOptions: {
 						writeToDisk: true,
 					}
