@@ -32,12 +32,7 @@ export const entity: Module<CesiumEntity, RootState> = {
 			type: ToolType.NOTATION,
 			desc: '',
 			color: EntityColor.RED,
-			position: {
-				x: 0,
-				y: 0,
-				z: 0,
-				cartesian: null,
-			}
+			position: [],
 		},
 		entityList: [{
 			title: ToolTitle.NOTATION,
@@ -69,19 +64,14 @@ export const entity: Module<CesiumEntity, RootState> = {
 			Object.assign(state.selectedEntity, entity)
 			console.log('selecte entity =>', toRaw(state.selectedEntity))
 		},
-		unselectEntity(state: CesiumEntity)
+		unselectEntity(state: CesiumEntity, type: ToolType = ToolType.NOTATION)
 		{
 			Object.assign(state.selectedEntity, {
 				key: '',
-				type: ToolType.NOTATION,
+				type,
 				desc: '',
 				color: EntityColor.RED,
-				position: {
-					x: 0,
-					y: 0,
-					z: 0,
-					cartesian: null,
-				}
+				position: [],
 			})
 			console.log('unselect entity!')
 		},
@@ -140,12 +130,7 @@ export const entity: Module<CesiumEntity, RootState> = {
 					type: ToolType.NOTATION,
 					desc: '',
 					color: EntityColor.RED,
-					position: {
-						x: 0,
-						y: 0,
-						z: 0,
-						cartesian: null,
-					}
+					position: [],
 				})
 			}
 		}
