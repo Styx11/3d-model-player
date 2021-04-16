@@ -1,9 +1,18 @@
 <template>
 	<div class="model_container">
-		<main :class="['model_main', selected ? 'tool_selected' : '']" id="model_main" ref="viewerRef"></main>
+		<main
+			:class="['model_main', selectedTool ? 'tool_selected' : '']"
+			id="model_main"
+			ref="viewerRef"
+		></main>
 		<section
 			class="model_position"
 		>WGS84 E: {{position.y.toFixed(5)}} N: {{position.x.toFixed(5)}} 高度: {{position.z.toFixed(3)}} m</section>
+		<div
+			class="tool_tip"
+			v-if="(selectedTool === 'line' || selectedTool=== 'area') && screenPosition.x && screenPosition.y"
+			:style="{position: 'absolute', top: screenPosition.y + 'px', left: screenPosition.x + 20 + 'px'}"
+		>{{ screenPosition.tip }}</div>
 	</div>
 </template>
 
@@ -12,7 +21,19 @@
 	import * as Cesium from 'cesium'
 
 	import { useStore } from '../../../store/index'
-	import { initViewer, initTileset, initHandler, zoomToTileset, usePosition, useClick, HEIGHT_OFFSET, PositionMaker } from '../../../hooks/cesium'
+	import
+	{
+		initViewer,
+		initTileset,
+		initHandler,
+		zoomToTileset,
+		usePosition,
+		useClick,
+		useRightClick,
+		HEIGHT_OFFSET,
+		PositionMaker,
+		ScreenPosition,
+	} from '../../../hooks/cesium'
 
 	Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiZjc1MGI5NC0wYTcyLTQ3YWYtYTNiMi03YmU5MjQ0ZTE1MDkiLCJpZCI6NDk1NjIsImlhdCI6MTYxNzQxNjIzMH0.OKpUIs85S_LatHupyCtso-ZtcpMjdrYVmSf61N93Ihg'
 
@@ -29,12 +50,17 @@
 
 			const store = useStore()
 			// 选中的工具
-			const selected = computed(() => store.state.cesiumEntity.selectedTool)
+			const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
 			const position = reactive<PositionMaker>({
 				x: 0,
 				y: 0,
 				z: 0,
 				cartesian: null,
+			})
+			const screenPosition = reactive<ScreenPosition>({
+				x: 0,
+				y: 0,
+				tip: '',
 			})
 
 			onMounted(() =>
@@ -61,8 +87,9 @@
 					viewer.camera.viewBoundingSphere(boundingSphere, new Cesium.HeadingPitchRange(0, -2.0, 0));
 
 					// 绑定事件
-					handler.setInputAction(usePosition(position), Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+					handler.setInputAction(usePosition(position, screenPosition), Cesium.ScreenSpaceEventType.MOUSE_MOVE)
 					handler.setInputAction(useClick(position, store), Cesium.ScreenSpaceEventType.LEFT_CLICK)
+					handler.setInputAction(useRightClick(position, store), Cesium.ScreenSpaceEventType.RIGHT_CLICK)
 
 					zoomToTileset(tileset)
 				})
@@ -76,7 +103,8 @@
 			return {
 				viewerRef,
 				position,
-				selected,
+				selectedTool,
+				screenPosition,
 			}
 		},
 	})
@@ -116,6 +144,12 @@
 			background-color: rgba(0, 0, 0, 0.6);
 			.flexContainer(row, center);
 			.label(12px, @WHITE_COLOR);
+		}
+
+		.tool_tip {
+			.label(12px, @WHITE_COLOR);
+			background-color: rgba(0, 0, 0, 0.6);
+			padding: 8px;
 		}
 
 		.model_main {
