@@ -10,10 +10,14 @@
 		</section>
 		<section class="info_body">
 			<section class="entity_content" :style="{color: `${entityTextColor}`}">
-				<div v-if="selectedEntity.type === 'notation' && selectedEntity.position">
-					<p>东：{{selectedEntity.position.y.toFixed(5)}}</p>
-					<p>北：{{selectedEntity.position.x.toFixed(5)}}</p>
-					<p>高：{{selectedEntity.position.z.toFixed(3)}} m</p>
+				<div v-if="selectedEntity.type === 'notation' && selectedEntity.position.length">
+					<p>东：{{selectedEntity.position[0].y.toFixed(5)}}</p>
+					<p>北：{{selectedEntity.position[0].x.toFixed(5)}}</p>
+					<p>高：{{selectedEntity.position[0].z.toFixed(3)}} m</p>
+				</div>
+				<div v-else-if="selectedEntity.type === 'line' && selectedEntity.position.length">
+					<p>投影总长：{{selectedPolylineDistance}} m</p>
+					<p>总高差：{{selectedPolylineHeightDiff}} m</p>
 				</div>
 			</section>
 			<section class="entity_desc" v-if="!editVisible">{{ selectedEntity.desc }}</section>
@@ -71,8 +75,9 @@
 
 	import { useStore } from '../../store'
 	import { useState } from '../../hooks'
-	import { updatePoint } from '../../hooks/cesium'
-	import { EntityColor, EntityTreeChild, EntityTextColor } from '@views/interface/Types'
+	import { getPointsDistance, getOverallHeightDiff } from '../../hooks/util'
+	import { updatePoint, updatePolyline } from '../../hooks/cesium'
+	import { EntityColor, EntityTreeChild, EntityTextColor, ToolType } from '@views/interface/Types'
 	import { CesiumEntityMutation } from '@views/store/entity'
 
 	export default defineComponent({
@@ -90,6 +95,17 @@
 			const store = useStore()
 			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
 			const entityTextColor = computed(() => EntityTextColor[selectedEntity.value.color])
+
+			const selectedPolylineDistance = computed(() =>
+			{
+				if (selectedEntity.value.type !== ToolType.LINE) return 0
+				return getPointsDistance(selectedEntity.value.position)
+			})
+			const selectedPolylineHeightDiff = computed(() =>
+			{
+				if (selectedEntity.value.type !== ToolType.LINE) return 0
+				return getOverallHeightDiff(selectedEntity.value.position)
+			})
 
 			const colors = [EntityColor.RED, EntityColor.ORANGE, EntityColor.YELLOW, EntityColor.GREEN, EntityColor.BLUE, EntityColor.PURPLE]
 			const [colorPanelVisible, setColorPanelVisible] = useState<boolean>(false)
@@ -119,7 +135,17 @@
 						slots: { title: 'title' },
 					} as EntityTreeChild
 				})
-				updatePoint(selectedEntity.value.key, selectedEntity.value.color, true)
+				// 更新选中时的样式
+				switch (selectedEntity.value.type)
+				{
+					case ToolType.NOTATION:
+						updatePoint(selectedEntity.value.key, selectedEntity.value.color, true)
+						break;
+					case ToolType.LINE:
+						updatePolyline(selectedEntity.value.key, selectedEntity.value.color, selectedEntity.value.position, true, true)
+					default:
+						break;
+				}
 			}
 
 			const handleEditCancel = () =>
@@ -165,6 +191,8 @@
 				colorPanelVisible,
 				setColorPanelVisible,
 				setEditVisible,
+				selectedPolylineDistance,
+				selectedPolylineHeightDiff,
 
 				handleSelectColor,
 				handleEditCancel,

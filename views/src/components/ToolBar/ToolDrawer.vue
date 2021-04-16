@@ -64,9 +64,9 @@
 
 	import { useStore } from '../../store'
 	import EntityInfo from './EntityInfo.vue'
-	import { updatePoint, removeEntity } from '../../hooks/cesium'
+	import { removeEntity, removeTempPoint, updateSelectedEntity } from '../../hooks/cesium'
 	import { CesiumEntityMutation } from '../../store/entity'
-	import { EntityColor, EntityTreeChild, ToolType } from '../../interface/Types'
+	import { EntityTreeChild, ToolType } from '../../interface/Types'
 
 	const rawTreeData: TreeDataItem[] = [
 		{
@@ -150,6 +150,7 @@
 		setup(props)
 		{
 			const store = useStore()
+			const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
 			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
 			const treeData = computed(() => store.state.cesiumEntity.entityList)
 			const colors = reactive<string[]>(['red', 'orange', 'yellow', 'green', 'blue', 'purple'])
@@ -161,24 +162,41 @@
 			{
 				store.commit(CesiumEntityMutation.REMOVE_ENTITY, { type, key })
 				removeEntity(key)
+				if (type === ToolType.LINE)
+				{
+					removeTempPoint()
+				}
 			}
 			const handleEntityCheck = (titleData: EntityTreeChild, uncheck?: boolean) =>
 			{
+				// 切换至另一个实体
 				if (!uncheck)
 				{
+					// 取消选中旧实体
 					if (selectedEntity.value.key)
 					{
-						updatePoint(selectedEntity.value.key, selectedEntity.value.color)
+						updateSelectedEntity(selectedEntity.value.type, selectedEntity.value, false)
 					}
 					store.commit(CesiumEntityMutation.SEL_ENTITY, titleData)
-					updatePoint(titleData.key, titleData.color, true)
+					updateSelectedEntity(selectedEntity.value.type, titleData, true)
 				}
+				// 取消选中
 				else
 				{
-					store.commit(CesiumEntityMutation.UNSEL_ENTITY)
-					updatePoint(titleData.key, titleData.color, false)
+					store.commit(CesiumEntityMutation.UNSEL_ENTITY, selectedEntity.value.type)
+					updateSelectedEntity(selectedEntity.value.type, titleData, false)
 				}
 			}
+
+			watch(selectedTool, () =>
+			{
+				// 取消选中旧实体
+				if (selectedEntity.value.key)
+				{
+					updateSelectedEntity(selectedEntity.value.type, selectedEntity.value, false)
+				}
+				store.commit(CesiumEntityMutation.UNSEL_ENTITY, selectedEntity.value.type)
+			})
 
 			return {
 				colors,
