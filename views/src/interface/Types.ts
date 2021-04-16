@@ -73,5 +73,5 @@ export interface EntityTreeChild extends Omit<TreeDataItem, 'key'>
 	title: string;
 	color: EntityColor;
 	type: ToolType;
-	position: PositionMaker;
+	position: PositionMaker[];
 }
