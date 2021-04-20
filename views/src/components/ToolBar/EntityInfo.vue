@@ -19,6 +19,13 @@
 					<p>投影总长：{{selectedPolylineDistance}} m</p>
 					<p>总高差：{{selectedPolylineHeightDiff}} m</p>
 				</div>
+				<div v-else-if="selectedEntity.type === 'area' && selectedEntity.position.length">
+					<p>周长：{{selectedPolylineDistance}} m</p>
+					<p>
+						投影面积：{{selectedPolygonArea}} m
+						<sup>2</sup>
+					</p>
+				</div>
 			</section>
 			<section class="entity_desc" v-if="!editVisible">{{ selectedEntity.desc }}</section>
 			<section class="entity_edit" v-else>
@@ -75,8 +82,8 @@
 
 	import { useStore } from '../../store'
 	import { useState } from '../../hooks'
-	import { getPointsDistance, getOverallHeightDiff } from '../../hooks/util'
-	import { updatePoint, updatePolyline } from '../../hooks/cesium'
+	import { getPointsDistance, getOverallHeightDiff, calcAreaCartesian3 } from '../../hooks/util'
+	import { updatePoint, updatePolygon, updatePolyline } from '../../hooks/cesium'
 	import { EntityColor, EntityTreeChild, EntityTextColor, ToolType } from '@views/interface/Types'
 	import { CesiumEntityMutation } from '@views/store/entity'
 
@@ -98,13 +105,18 @@
 
 			const selectedPolylineDistance = computed(() =>
 			{
-				if (selectedEntity.value.type !== ToolType.LINE) return 0
+				if (selectedEntity.value.type !== ToolType.LINE && selectedEntity.value.type !== ToolType.AREA) return 0
 				return getPointsDistance(selectedEntity.value.position)
 			})
 			const selectedPolylineHeightDiff = computed(() =>
 			{
 				if (selectedEntity.value.type !== ToolType.LINE) return 0
 				return getOverallHeightDiff(selectedEntity.value.position)
+			})
+			const selectedPolygonArea = computed(() =>
+			{
+				if (selectedEntity.value.type !== ToolType.AREA || selectedEntity.value.position.length < 3) return 0
+				return calcAreaCartesian3(selectedEntity.value.position)
 			})
 
 			const colors = [EntityColor.RED, EntityColor.ORANGE, EntityColor.YELLOW, EntityColor.GREEN, EntityColor.BLUE, EntityColor.PURPLE]
@@ -139,10 +151,14 @@
 				switch (selectedEntity.value.type)
 				{
 					case ToolType.NOTATION:
-						updatePoint(selectedEntity.value.key, selectedEntity.value.color, true)
+						updatePoint(selectedEntity.value.key, selectedEntity.value.color, true, true)
 						break;
 					case ToolType.LINE:
 						updatePolyline(selectedEntity.value.key, selectedEntity.value.color, selectedEntity.value.position, true, true)
+						break;
+					case ToolType.AREA:
+						updatePolygon(selectedEntity.value.key, selectedEntity.value.color, selectedEntity.value.position, true, true)
+						break;
 					default:
 						break;
 				}
@@ -191,6 +207,7 @@
 				colorPanelVisible,
 				setColorPanelVisible,
 				setEditVisible,
+				selectedPolygonArea,
 				selectedPolylineDistance,
 				selectedPolylineHeightDiff,
 

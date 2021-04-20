@@ -64,7 +64,7 @@
 
 	import { useStore } from '../../store'
 	import EntityInfo from './EntityInfo.vue'
-	import { removeEntity, removeTempPoint, updateSelectedEntity } from '../../hooks/cesium'
+	import { removeEntity, removeTempPoint, removeTempPolyline, updateSelectedEntity } from '../../hooks/cesium'
 	import { CesiumEntityMutation } from '../../store/entity'
 	import { EntityTreeChild, ToolType } from '../../interface/Types'
 
@@ -166,6 +166,10 @@
 				{
 					removeTempPoint()
 				}
+				else if (type === ToolType.AREA)
+				{
+					removeTempPolyline()
+				}
 			}
 			const handleEntityCheck = (titleData: EntityTreeChild, uncheck?: boolean) =>
 			{
@@ -178,13 +182,13 @@
 						updateSelectedEntity(selectedEntity.value.type, selectedEntity.value, false)
 					}
 					store.commit(CesiumEntityMutation.SEL_ENTITY, titleData)
-					updateSelectedEntity(selectedEntity.value.type, titleData, true)
+					updateSelectedEntity(titleData.type, titleData, true)
 				}
 				// 取消选中
 				else
 				{
 					store.commit(CesiumEntityMutation.UNSEL_ENTITY, selectedEntity.value.type)
-					updateSelectedEntity(selectedEntity.value.type, titleData, false)
+					updateSelectedEntity(titleData.type, titleData, false)
 				}
 			}
 
