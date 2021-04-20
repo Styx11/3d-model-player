@@ -1,5 +1,6 @@
 import { RouteRecordRaw } from 'vue-router'
 import List from '../pages/list/List.vue'
+import Home from '../pages/home/Home.vue'
 
 const routes: Array<RouteRecordRaw> = [
 	// {
@@ -21,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
 		// route level code-splitting
 		// this generates a separate chunk (about.[hash].js) for this route
 		// which is lazy-loaded when the route is visited.
-		component: () => import(/* webpackChunkName: "home" */ '@/pages/home/Home.vue'),
+		component: Home,
 	},
 
 	// will match everything and put it under `$route.params.pathMatch`
