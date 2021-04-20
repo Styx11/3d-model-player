@@ -10,6 +10,12 @@ import { CesiumEntityMutation } from '../store/entity';
 
 let _viewer: Cesium.Viewer;
 
+// 保存还在创建中的 polygon 面积的点信息
+const _tempPolygon: { id: string; positions: PositionMaker[] } = {
+	id: '',
+	positions: []
+}
+
 // 保存还在创建状态中的 polyline 点信息
 const _tempPolyline: { id: string; positions: PositionMaker[] } = {
 	id: '',
@@ -90,7 +96,7 @@ export const usePosition = (position: PositionMaker, screenPosition: ScreenPosit
 			x: e.endPosition.x,
 			y: e.endPosition.y,
 			tip: _tempPoint.length > 1
-				? '鼠标右键单击终点可结束绘制'
+				? _tempPolygon.id ? '鼠标右键单击起点可结束绘制' : '鼠标右键单击终点可结束绘制'
 				: _tempPoint.length === 1 ? '点击继续测绘' : '单击鼠标左键开始测绘'
 		})
 
@@ -123,9 +129,19 @@ export const useClick = (position: PositionMaker, store: Store<AllState>): (e) =
 	// 未创建完毕就切换工具类型，则不会保存这次的内容
 	watch(selectedTool, (newVal, oldVal) =>
 	{
-		if (oldVal === ToolType.LINE && newVal !== oldVal)
+		if (newVal !== oldVal)
 		{
-			endPolyline(store, true)
+			switch (oldVal)
+			{
+				case ToolType.LINE:
+					endPolyline(store, true)
+					break;
+				case ToolType.AREA:
+					endPolygon(store, true)
+					break;
+				default:
+					break
+			}
 		}
 	})
 
@@ -161,8 +177,7 @@ export const useClick = (position: PositionMaker, store: Store<AllState>): (e) =
 					createPolyline(_position, key, EntityColor.RED);
 					return;
 				case ToolType.AREA:
-					console.log('we got area')
-					store.commit(CesiumEntityMutation.SEL_TOOL, '')
+					createPolygon(_position, key, EntityColor.RED);
 					return;
 				default:
 					break;
@@ -177,7 +192,7 @@ export const useRightClick = (position: PositionMaker, store: Store<AllState>): 
 {
 	return (e) =>
 	{
-		const _position = Object.assign({}, position)
+		const _position = Object.assign({}, toRaw(position))
 		const selectedTool = store.state.cesiumEntity.selectedTool
 		const picked = _viewer.scene.pick(e.position)
 		if (Cesium.defined(picked) && picked.id instanceof Cesium.Entity && selectedTool)
@@ -185,21 +200,26 @@ export const useRightClick = (position: PositionMaker, store: Store<AllState>): 
 			const key = (picked.id as Cesium.Entity).id
 			if (picked.primitive instanceof Cesium.PointPrimitive)
 			{
-				if (_tempPoint.length > 1 && key === _tempPoint[_tempPoint.length - 1].id)
+				switch (selectedTool)
 				{
-					switch (selectedTool)
-					{
-						case ToolType.NOTATION:
-							return;
-						case ToolType.LINE:
+					case ToolType.NOTATION:
+						return;
+					case ToolType.LINE:
+						// 右键终点
+						if (_tempPoint.length > 1 && key === _tempPoint[_tempPoint.length - 1].id)
+						{
 							endPolyline(store)
-							return;
-						case ToolType.AREA:
-							console.log('end area')
-							return;
-						default:
-							break;
-					}
+						}
+						return;
+					case ToolType.AREA:
+						// 右键起点
+						if (_tempPoint.length > 1 && key === _tempPoint[0].id)
+						{
+							endPolygon(store)
+						}
+						return;
+					default:
+						break;
 				}
 			}
 			// console.log('selected point =>', picked)
@@ -229,7 +249,7 @@ const createPoint = (position: PositionMaker, key: string, color: EntityColor, a
 	return billboard
 }
 
-export const updatePoint = (key: string, color: EntityColor, active?: boolean) =>
+export const updatePoint = (key: string, color: EntityColor, active?: boolean, nozoom?: boolean) =>
 {
 	const entity = _viewer.entities.getById(key)
 	if (Cesium.defined(entity))
@@ -237,7 +257,7 @@ export const updatePoint = (key: string, color: EntityColor, active?: boolean) =
 		entity.billboard.image = new Cesium.ConstantProperty(`/static/svg/pic-mark-${color}${active ? '-active' : ''}.svg`);
 		if (active)
 		{
-			_viewer.flyTo(entity, { duration: 1 })
+			!nozoom && _viewer.flyTo(entity, { duration: 1 })
 		}
 	}
 }
@@ -306,11 +326,9 @@ const endPolyline = (store: Store<AllState>, dirty?: boolean) =>
 	_tempPolyline.id = ''
 	_tempPolyline.positions = []
 
-	_tempPoint.forEach(p => removeEntity(p.id))
-	_tempPoint.splice(0, _tempPoint.length)
+	removeTempPoint()
 
 	console.log('_tempPolyline =>', _tempPolyline)
-	console.log('_tempPoint =>', _tempPoint)
 }
 
 // 更新线条颜色、聚焦线条、创建/销毁聚焦时的临时点
@@ -340,11 +358,140 @@ export const updatePolyline = (key: string, color: EntityColor, positions?: Posi
 		}
 		else
 		{
-			_tempPoint.forEach(p => removeEntity(p.id))
-			_tempPoint.splice(0, _tempPoint.length)
+			removeTempPoint()
 			console.log('_tempPoint removed =>', _tempPoint)
 		}
 	}
+}
+
+// 创建面积实体
+// 思路是在创建面积的同时，创建临时线段和临时点，临时点仅在创建时出现，临时线仅在创建和查看时出现并且颜色总为白色
+const createPolygon = (position: PositionMaker, key: string, color: EntityColor) =>
+{
+	if (!_tempPolygon.id) _tempPolygon.id = key
+
+	createTempPoint(position, color)
+	_tempPolygon.positions.push(position)
+	createTempPolyline(_tempPolygon.positions, _tempPolygon.positions.length > 2)
+
+	const polygonPositions = _tempPolygon.positions.map(p => p.cartesian)
+	const entity = _viewer.entities.getById(_tempPolygon.id)
+
+	if (Cesium.defined(entity))
+	{
+		(entity.polygon.hierarchy as any) = new Cesium.PolygonHierarchy(polygonPositions)
+	}
+	else
+	{
+		// 创建中无 outline
+		const p = _viewer.entities.add({
+			id: _tempPolygon.id,
+			polygon: {
+				height: 39.8,
+				hierarchy: new Cesium.PolygonHierarchy(polygonPositions),
+				material: Cesium.Color[color.toUpperCase()].withAlpha(0.3),
+			}
+		})
+		console.log('polygon =>', p)
+	}
+}
+
+// 结束绘制面积
+const endPolygon = (store: Store<AllState>, dirty?: boolean) =>
+{
+	if (dirty)
+	{
+		removeEntity(_tempPolygon.id)
+	}
+	else
+	{
+		_tempPolygon.positions.push(Object.assign({}, _tempPolygon.positions[0]))
+		// 提交commit
+		store.commit(CesiumEntityMutation.SEL_TOOL, '')
+		store.commit(CesiumEntityMutation.ADD_ENTITY, {
+			type: ToolType.AREA,
+			child: {
+				key: _tempPolygon.id,
+				title: ToolTitle.AREA,
+				isLeaf: true,
+				position: [..._tempPolygon.positions],
+				color: EntityColor.RED,
+				desc: '',
+				type: ToolType.AREA,
+				slots: { title: 'title' },
+			} as EntityTreeChild
+		});
+		const entity = _viewer.entities.getById(_tempPolygon.id)
+		if (Cesium.defined(entity))
+		{
+			entity.polygon.outline = new Cesium.ConstantProperty(true)
+			entity.polygon.outlineColor = new Cesium.ConstantProperty(Cesium.Color.RED)
+		}
+	}
+
+	_tempPolygon.id = ''
+	_tempPolygon.positions = []
+
+	removeTempPolyline()
+	removeTempPoint()
+
+	console.log('_tempPolygon =>', _tempPolygon)
+}
+
+export const updatePolygon = (key: string, color: EntityColor, positions?: PositionMaker[], active?: boolean, nozoom?: boolean) =>
+{
+	const entity = _viewer.entities.getById(key)
+	if (!Cesium.defined(entity)) return
+
+	entity.polygon.outlineColor = Cesium.Color[color.toUpperCase()]
+	entity.polygon.material = new Cesium.ColorMaterialProperty(Cesium.Color[color.toUpperCase()].withAlpha(0.3))
+
+	if (active && Array.isArray(positions))
+	{
+		createTempPolyline(positions, true)
+		!nozoom && _viewer.flyTo(entity, { duration: 1 })
+	}
+	else
+	{
+		removeTempPolyline()
+	}
+}
+
+// 创建临时线段，总为白色
+export const createTempPolyline = (positions: PositionMaker[], show?: boolean) =>
+{
+	if (!_tempPolyline.id) _tempPolyline.id = uid(13)
+
+	_tempPolyline.positions = [...positions]
+
+	if (!show) return
+
+	const polylinePositions = _tempPolyline.positions.map(p => p.cartesian)
+	const entity = _viewer.entities.getById(_tempPolyline.id)
+
+	if (Cesium.defined(entity))
+	{
+		entity.polyline.positions = new Cesium.ConstantProperty(polylinePositions)
+	}
+	else
+	{
+		const p = _viewer.entities.add({
+			id: _tempPolyline.id,
+			polyline: {
+				positions: polylinePositions,
+				width: 1,
+				material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
+			}
+		})
+		console.log('temporary polyline =>', p)
+	}
+}
+
+export const removeTempPolyline = () =>
+{
+	removeEntity(_tempPolyline.id)
+	_tempPolyline.id = ''
+	_tempPolyline.positions.splice(0, _tempPolyline.positions.length)
 }
 
 // dirty 表示改组实体已经算入了高度误差
@@ -388,7 +535,6 @@ export const createTempPoint = (position: PositionMaker, color: EntityColor, dir
 			outlineColor: Cesium.Color.WHITE,
 			scale: 0.4,
 			scaleByDistance: new Cesium.NearFarScalar(10000000, 1, 10000001, 0.0)
-
 		}
 	});
 }
@@ -425,6 +571,9 @@ export const updateSelectedEntity = (type: ToolType, value: EntityTreeChild, sel
 				: updatePolyline(value.key, value.color);
 			break;
 		case ToolType.AREA:
+			select
+				? updatePolygon(value.key, value.color, value.position, true)
+				: updatePolygon(value.key, value.color);
 			break;
 		default:
 			break;
