@@ -10,6 +10,8 @@ import { CesiumEntityMutation } from '../store/entity';
 
 let _viewer: Cesium.Viewer;
 
+let _vision: 'ortho' | '3d' = '3d';
+
 // 保存还在创建中的 polygon 面积的点信息
 const _tempPolygon: { id: string; positions: PositionMaker[] } = {
 	id: '',
@@ -83,6 +85,23 @@ export const initHandler = (): Cesium.ScreenSpaceEventHandler =>
 export const zoomToTileset = (tileset: Cesium.Cesium3DTileset) =>
 {
 	return Cesium.defined(tileset) && _viewer.zoomTo(tileset)
+}
+
+export const flyTo = (tileset: Cesium.Cesium3DTileset | Cesium.Entity): Promise<boolean> =>
+{
+	if (_vision !== '3d') _vision = '3d'
+	return Cesium.defined(tileset) && _viewer.flyTo(tileset, { duration: 1 })
+}
+
+export const flyToInOrtho = (tileset: Cesium.Cesium3DTileset | Cesium.Entity): Promise<boolean> =>
+{
+	if (_vision !== 'ortho') _vision = 'ortho'
+	return Cesium.defined(tileset) && _viewer.flyTo(tileset, {
+		duration: 1, offset: new Cesium.HeadingPitchRange(
+			Cesium.Math.toRadians(0.0), // east, default value is 0.0 (north)
+			Cesium.Math.toRadians(-90),    // default value (looking down)
+		)
+	})
 }
 
 // 获取模型坐标（目前默认为 WGS84 坐标）
@@ -238,7 +257,7 @@ const createPoint = (position: PositionMaker, key: string, color: EntityColor, a
 {
 	const billboard = _viewer.entities.add({
 		id: key,
-		position: position.cartesian,
+		position: _vision === 'ortho' ? Object.assign({}, position.cartesian, { z: position.cartesian.z + 0.8 }) : position.cartesian,
 		billboard: {
 			image: `/static/svg/pic-mark-${color}${active ? '-active' : ''}.svg`,
 			width: 19,
@@ -257,7 +276,7 @@ export const updatePoint = (key: string, color: EntityColor, active?: boolean, n
 		entity.billboard.image = new Cesium.ConstantProperty(`/static/svg/pic-mark-${color}${active ? '-active' : ''}.svg`);
 		if (active)
 		{
-			!nozoom && _viewer.flyTo(entity, { duration: 1 })
+			!nozoom && (_vision === '3d' ? flyTo(entity) : flyToInOrtho(entity))
 		}
 	}
 }
@@ -354,7 +373,7 @@ export const updatePolyline = (key: string, color: EntityColor, positions?: Posi
 					createTempPoint(p, color, true)
 				})
 			}
-			!nozoom && _viewer.flyTo(entity, { duration: 1 })
+			!nozoom && (_vision === '3d' ? flyTo(entity) : flyToInOrtho(entity))
 		}
 		else
 		{
@@ -449,7 +468,7 @@ export const updatePolygon = (key: string, color: EntityColor, positions?: Posit
 	if (active && Array.isArray(positions))
 	{
 		createTempPolyline(positions, true)
-		!nozoom && _viewer.flyTo(entity, { duration: 1 })
+		!nozoom && (_vision === '3d' ? flyTo(entity) : flyToInOrtho(entity))
 	}
 	else
 	{

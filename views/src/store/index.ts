@@ -7,18 +7,21 @@ import { CesiumEntity, entity } from './entity/index'
 // https://next.vuex.vuejs.org/guide/typescript-support.html#typing-store-property-in-vue-component
 export interface RootState
 {
-	spinning: boolean
+	spinning: boolean;
+	selectedTab: 'ortho' | '3d';
 }
 
 export enum RootStateMutation
 {
-	SET_SPINNING = 'setSpinning'
+	SET_SPINNING = 'setSpinning',
+	SEL_TAB = 'selectTab',
 }
 
 // vuex 模块化 typescript 支持
 // https://blog.csdn.net/fanweilin0123/article/details/109903447
 export interface AllState extends RootState
 {
+	selectedTab: 'ortho' | '3d';
 	spinning: boolean;
 	modelFile: ModelFile;
 	cesiumEntity: CesiumEntity;
@@ -41,11 +44,16 @@ export default createStore<RootState>({
 	},
 	state: {
 		spinning: false,
+		selectedTab: '3d',
 	},
 	mutations: {
 		setSpinning(state: RootState, spinning: boolean)
 		{
 			state.spinning = spinning
+		},
+		selectTab(state: RootState, tab: 'ortho' | '3d')
+		{
+			state.selectedTab = tab
 		}
 	},
 	actions: {
