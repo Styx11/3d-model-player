@@ -4,7 +4,7 @@
 			<aside class="title_bar_aside">
 				<DragableItem>
 					<section class="aside_title">
-						<p v-if="isHomePage" class="title_item">Keris 三维模型播放器</p>
+						<p v-if="isHomePage" class="title_item">三维模型播放器</p>
 						<div v-else @click="goBack" class="title_item title_item_back">
 							<LeftOutlined />
 							<span :style="{ marginLeft: '8px' }">返回</span>
@@ -20,11 +20,14 @@
 					</DragableItem>
 				</aside>
 				<section class="main_right">
-					<slot name="operationSection">
-						<span class="default_operation_text">其他1</span>
-						<span class="default_operation_text">其他2</span>
-						<span class="default_operation_text">其他3</span>
-					</slot>
+					<Space>
+						<Button :class="selectedTab !== 'ortho' && 'transparent_btn'" @click="handleSelTab('ortho')">
+							<span class="default_operation_text">正射影像</span>
+						</Button>
+						<Button :class="selectedTab !== '3d' && 'transparent_btn'" @click="handleSelTab('3d')">
+							<span class="default_operation_text">三维模型</span>
+						</Button>
+					</Space>
 				</section>
 			</main>
 		</div>
@@ -32,10 +35,11 @@
 </template>
 
 <script lang='ts'>
-	import { defineComponent } from 'vue'
-	import { Divider } from 'ant-design-vue'
+	import { defineComponent, computed } from 'vue'
+	import { Divider, Button, Space } from 'ant-design-vue'
 	import { LeftOutlined } from '@ant-design/icons-vue'
 
+	import { useStore, RootStateMutation } from '@/store'
 	import DragableContainer from '../Drag/DragableContainer.vue'
 	import DragableItem from '../Drag/DragableItem.vue'
 
@@ -44,15 +48,33 @@
 	export default defineComponent({
 		name: 'TitleBar',
 		components: {
+			Button,
 			Divider,
 			DragableItem,
 			DragableContainer,
 			LeftOutlined,
+			Space,
 		},
 		props: {
 			projectName: {
 				type: String,
 				default: '项目名称',
+			}
+		},
+		setup(props)
+		{
+			const store = useStore()
+			const selectedTab = computed(() => store.state.selectedTab)
+
+			const handleSelTab = (tab: 'ortho' | '3d') =>
+			{
+				if (selectedTab.value === tab) return
+				store.commit(RootStateMutation.SEL_TAB, tab)
+			}
+
+			return {
+				selectedTab,
+				handleSelTab,
 			}
 		},
 		computed: {
@@ -105,6 +127,7 @@
 					margin: 0;
 				}
 				.title_item_back {
+					transition: all @ease-base-out @animation-duration-slow;
 					&:hover {
 						color: @PRIMARY_COlOR;
 					}
@@ -124,9 +147,32 @@
 				height: 100%;
 				flex: 1 1 auto;
 				.flexContainer(row, flex-end);
+
 				.default_operation_text {
+					transition: all @ease-base-out @animation-duration-slow;
 					.label(14px, @WHITE_COLOR);
 				}
+
+				::v-deep(.ant-btn) {
+					width: 78px;
+					height: 24px;
+					padding: 4px 15px;
+					border-radius: 2px;
+					background-color: #007aff;
+					border-color: transparent;
+					.flexContainer(row, center);
+
+					&.transparent_btn {
+						background-color: transparent;
+
+						&:hover {
+							.default_operation_text {
+								color: @PRIMARY_COlOR;
+							}
+						}
+					}
+				}
+
 				& > * {
 					height: 100%;
 					margin-left: 24px;

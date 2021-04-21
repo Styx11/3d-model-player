@@ -8,7 +8,7 @@
 				</section>
 			</header>
 			<section class="drawer_body">
-				<div class="body_tree" v-if="treeData && treeData.length">
+				<div class="body_tree" v-if="treeData && !dataEmpty">
 					<Tree :tree-data="treeData" blockNode :selectable="false" defaultExpandAll>
 						<template #title="titleData">
 							<Icon
@@ -153,6 +153,7 @@
 			const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
 			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
 			const treeData = computed(() => store.state.cesiumEntity.entityList)
+			const dataEmpty = computed(() => treeData.value.every(d => !d.children.length))
 			const colors = reactive<string[]>(['red', 'orange', 'yellow', 'green', 'blue', 'purple'])
 
 			const drawerVisible = ref<boolean>(!!(treeData.value && treeData.value.length))
@@ -205,6 +206,7 @@
 			return {
 				colors,
 				treeData,
+				dataEmpty,
 				drawerVisible,
 				selectedEntity,
 				toggleDrawerVisible,
