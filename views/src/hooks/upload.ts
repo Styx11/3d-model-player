@@ -72,7 +72,7 @@ export const useUploadConfirm = (store: Store<AllState>): (fileState: IModelForm
 			message.error({ content: '请上传一个模型文件！', key: 'no_file' });
 			throw new Error('no file')
 		}
-		await new Promise((resolve) => setTimeout(() => resolve(true), 2000))
+
 
 		const modelFile = _fileList.map<ModelFileState>(rawFile => ({
 			name: rawFile.name,
@@ -85,9 +85,12 @@ export const useUploadConfirm = (store: Store<AllState>): (fileState: IModelForm
 			location: fileState.location,
 			tag: fileState.tag,
 			uploadAt: Date.now(),
+			previewPath: '',
 		}))[0]
 
 		const model = await IPCRendererManager.getInstance().invokeUploadModel(modelFile)
+		await new Promise((resolve) => setTimeout(() => resolve(true), 1000))
+
 		store.commit(ModelFileMutation.UPLOAD_FILE, model)
 
 		_fileList.splice(0, _fileList.length)
@@ -100,9 +103,11 @@ export const useUploadRemove = (store: Store<AllState>): (uid: string) => Promis
 {
 	return async (uid: string) =>
 	{
-		await new Promise((resolve) => setTimeout(() => resolve(true), 2000))
 		await IPCRendererManager.getInstance().invokeRemoveModel(uid)
+		await new Promise((resolve) => setTimeout(() => resolve(true), 1000))
+
 		store.commit(ModelFileMutation.REMOVE_FILE, uid)
+
 		return true
 	}
 }

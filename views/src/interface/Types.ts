@@ -16,6 +16,7 @@ export interface ModelFileState extends IModelFormState
 	uid: string;
 	name: string;         // name 带有文件名及后缀
 	path: string;
+	previewPath: string;  // 预览图地址
 	size: number;
 	uploadAt: number;
 	lastModified: number;

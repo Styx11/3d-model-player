@@ -2,6 +2,7 @@ const fs = require('fs/promises')
 const rimraf = require('rimraf')
 const path = require('path')
 
+import * as AdmZip from 'adm-zip'
 import { Paths } from '@main/constants/path'
 import { ModelFileState } from '@views/interface/Types'
 
@@ -17,7 +18,7 @@ export default class ModelManager
 
 	public async init()
 	{
-		this._folderPath = path.resolve(Paths.PROJECT_ROOT, 'src/model/file')
+		this._folderPath = path.resolve(Paths.PROJECT_ROOT, 'dist/models')
 		try
 		{
 			return await fs.access(this._folderPath)
@@ -77,17 +78,31 @@ export default class ModelManager
 		console.log('model inserted =>', model)
 
 		const modelFolderPath = path.resolve(this._folderPath, `${model.uid}`)
-		const modelPath = path.resolve(modelFolderPath, `${model.name}`)
+
 		const modelDescPath = path.resolve(modelFolderPath, 'desc.json')
+		const extname = path.extname(model.path)
+		if (extname === '.zip')
+		{
+			const file = new AdmZip(model.path)
+			await file.extractAllToAsync(modelFolderPath)
 
-		// 以 uid 创建文件夹
-		await fs.mkdir(modelFolderPath)
+			await fs.writeFile(modelDescPath, JSON.stringify(Object.assign(model, {
+				path: `/models/${model.uid}/Production.json`,
+				previewPath: `/models/${model.uid}/preview.png`,
+			})))
+		}
+		else
+		{
+			// const modelPath = path.resolve(modelFolderPath, `${model.name}`)
+			// // 以 uid 创建文件夹
+			// await fs.mkdir(modelFolderPath)
 
-		// 拷贝源文件
-		await fs.copyFile(model.path, modelPath)
+			// // 拷贝源文件
+			// await fs.copyFile(model.path, modelPath)
 
-		// 创建描述文件
-		await fs.writeFile(modelDescPath, JSON.stringify(Object.assign(model, { path: modelPath })))
+			// // 创建描述文件
+			// await fs.writeFile(modelDescPath, JSON.stringify(Object.assign(model, { path: modelPath })))
+		}
 
 		return Object.assign({}, model)
 	}

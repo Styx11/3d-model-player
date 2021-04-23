@@ -8,7 +8,7 @@ if (isDev)
 	process.env.NODE_ENV = 'development'
 
 	// soft reset, it will only refresh webContents
-	require('electron-reload')(Paths.PROJECT_ROOT, {})
+	require('electron-reload')(Paths.PROJECT_ROOT, { ignored: [/dist\/models|[/\\]\./] })
 }
 
 try
