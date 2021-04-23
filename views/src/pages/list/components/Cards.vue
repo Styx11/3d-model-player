@@ -8,7 +8,7 @@
 				<Card hoverable style="width: 100%;">
 					<template #cover>
 						<div class="card_cover" style="width: 100%; height: 327.7px;">
-							<router-link to="/home">
+							<router-link :to="`/home?uid=${m.uid}`">
 								<div class="card_mask">
 									<Tooltip placement="bottom">
 										<template #title>删除模型文件</template>
@@ -20,7 +20,7 @@
 									<p>查看模型</p>
 								</div>
 							</router-link>
-							<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+							<img alt="example" :src="m.previewPath" />
 						</div>
 					</template>
 					<Meta>
@@ -28,7 +28,9 @@
 							{{ m.title }}
 							<Tag>{{ m.tag }}</Tag>
 						</template>
-						<template #description>{{ m.desc }}</template>
+						<template #description>
+							<Paragraph :ellipsis="{ tooltip: m.desc, rows: 1 }" :content="m.desc" />
+						</template>
 					</Meta>
 				</Card>
 			</Col>
@@ -38,12 +40,12 @@
 
 <script lang="ts">
 	import { defineComponent, PropType, createVNode } from 'vue'
-	import { Card, Col, Row, Tag, Tooltip, Modal, message } from 'ant-design-vue'
+	import { Card, Col, Row, Tag, Tooltip, Modal, message, Typography } from 'ant-design-vue'
 	import { EyeOutlined, CloseCircleFilled, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 	const { Meta } = Card
+	const { Paragraph } = Typography
 
 	import { useStore } from '../../../store'
-	import { ModelFileMutation } from '../../../store/file'
 	import { useUploadRemove } from '../../../hooks/upload'
 	import { ModelFileState } from '../../../interface/Types'
 	import UploadCard from './UploadCard.vue'
@@ -56,6 +58,7 @@
 			Row,
 			Meta,
 			Tag,
+			Paragraph,
 			Tooltip,
 			UploadCard,
 			EyeOutlined,
@@ -128,6 +131,11 @@
 				float: right;
 			}
 		}
+
+		::v-deep(.ant-typography.ant-typography-ellipsis) {
+			margin: 0;
+		}
+
 		.card_cover {
 			width: 100%;
 			height: 328px;

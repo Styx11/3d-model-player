@@ -28,7 +28,7 @@
 							:fileList="fileList"
 							:customRequest="customUpload"
 							:remove="customRemove"
-							accept=".obj, .fbx, .dae, .gltf, .glb"
+							accept=".obj, .fbx, .dae, .gltf, .glb, .zip, .rar"
 						>
 							<p class="ant-upload-drag-icon">
 								<InboxOutlined />

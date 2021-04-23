@@ -23,7 +23,7 @@
 	import { useStore } from '../../store'
 	import Tags from './components/Tags.vue'
 	import Cards from './components/Cards.vue'
-	import TitleBar from '@/components/TitleBar'
+	import TitleBar from '@/components/TitleBar/index.vue'
 	import { ModelFileState } from '@views/interface/Types'
 
 	export default defineComponent({
