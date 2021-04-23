@@ -1,3 +1,4 @@
+productName: 三维模型播放器
 npmRebuild: false # 是否在开始编译前重构原生依赖,可先尝试true, 如果出现问题再修改为false
 directories:
     output: release-builds
