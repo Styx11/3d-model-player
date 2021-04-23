@@ -13,7 +13,7 @@
 				</DragableItem>
 			</aside>
 			<Divider type="vertical" style="{{ margin: 0 }}" />
-			<main class="title_bar_main">
+			<main class="title_bar_main" v-if="!isHomePage">
 				<aside class="main_left">
 					<DragableItem>
 						<span class="project_name">{{ projectName }}</span>

@@ -43,11 +43,12 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, onMounted, onBeforeUnmount, ref, reactive, computed, watch } from 'vue'
+	import { defineComponent, onMounted, onBeforeUnmount, ref, reactive, computed, watch, PropType, toRefs } from 'vue'
 	import { Tooltip } from 'ant-design-vue'
 	import * as Cesium from 'cesium'
 
 	import { useStore } from '../../../store/index'
+	import { ModelFileState } from '@/interface/Types'
 	import
 	{
 		initViewer,
@@ -71,8 +72,15 @@
 		components: {
 			Tooltip,
 		},
-		setup()
+		props: {
+			model: {
+				type: Object as PropType<ModelFileState>,
+				required: true,
+			}
+		},
+		setup(props)
 		{
+			const { model } = toRefs(props)
 			const viewerRef = ref(null)
 			let tileset: Cesium.Cesium3DTileset = null
 			let viewer: Cesium.Viewer = null
@@ -103,7 +111,7 @@
 			{
 
 				viewer = initViewer(viewerRef)
-				tileset = initTileset()
+				tileset = initTileset(model.value.path)
 				handler = initHandler()
 
 				tileset.readyPromise.then(tileset =>

@@ -1,23 +1,26 @@
 <template>
 	<div class="project_home_container">
-		<TitleBar />
+		<TitleBar :project-name="model.title" />
 		<main class="container_main">
 			<ToolBar />
 			<ToolDrawer />
-			<Model />
+			<Model :model="model" />
 		</main>
 	</div>
 </template>
 
 <script lang='ts'>
-	import { defineComponent, defineAsyncComponent } from 'vue'
-	import TitleBar from '@/components/TitleBar'
-	import ToolBar from '@/components/ToolBar'
-	import ToolDrawer from '@/components/ToolBar/ToolDrawer'
+	import { defineComponent, defineAsyncComponent, computed } from 'vue'
+	import { useRoute } from 'vue-router'
+
+	import { useStore } from '@/store'
+	import TitleBar from '@/components/TitleBar/index.vue'
+	import ToolBar from '@/components/ToolBar/index.vue'
+	import ToolDrawer from '@/components/ToolBar/ToolDrawer.vue'
 	import { Spin } from 'ant-design-vue'
 
 	export default defineComponent({
-		name: 'project-home',
+		name: 'Home',
 		components: {
 			TitleBar,
 			ToolBar,
@@ -28,12 +31,18 @@
 				delay: 100,
 			})
 		},
-		computed: {
-		},
-		methods: {
-		},
-		mounted()
+		setup()
 		{
+			const route = useRoute()
+			const store = useStore()
+
+			const uid = computed(() => route.query.uid)
+			const model = computed(() => store.state.modelFile.fileList.filter(f => f.uid === uid.value)[0])
+			console.log('model =>', model)
+
+			return {
+				model,
+			}
 		},
 	})
 </script>
