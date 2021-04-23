@@ -1,28 +1,7 @@
 import { app, BrowserWindow } from 'electron'
 import IPCMainManager from '../ipc/IPCMainManager'
 import ModelManager from '../model/ModelManager'
-
-function createWindow(): BrowserWindow
-{
-	const win = new BrowserWindow({
-		minWidth: 1280,
-		minHeight: 800,
-		center: true,
-		titleBarStyle: 'hiddenInset',
-		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false,
-			devTools: true,
-		},
-	})
-	win.loadURL('http://localhost:8080')
-	win.maximize()
-	if (process.env.NODE_ENV === 'development')
-	{
-		win.webContents.openDevTools()
-	}
-	return win
-}
+import WindowManager from './WindowManager'
 
 export default class Application
 {
@@ -39,13 +18,28 @@ export default class Application
 		return this._app
 	}
 
+	private initWin()
+	{
+		const loadingWin = WindowManager.getInstance().createLoadingWindow()
+		this._win = WindowManager.getInstance().createMainWindow()
+
+		this._win.on('ready-to-show', () =>
+		{
+			setTimeout(() =>
+			{
+				loadingWin.destroy()
+				this._win.show()
+			}, 1500)
+		})
+	}
+
 	public async initApplication()
 	{
 		await app.whenReady()
 		await ModelManager.getInstance().init()
 		IPCMainManager.getInstance().init()
 
-		this._win = createWindow()
+		this.initWin()
 
 		app.on('window-all-closed', () =>
 		{
@@ -59,7 +53,7 @@ export default class Application
 		{
 			if (BrowserWindow.getAllWindows().length === 0)
 			{
-				this._win = createWindow()
+				this.initWin()
 			}
 		})
 	}
