@@ -3,14 +3,6 @@ import List from '../pages/list/List.vue'
 import Home from '../pages/home/Home.vue'
 
 const routes: Array<RouteRecordRaw> = [
-	// {
-	// 	path: '/',
-	// 	name: 'Login',
-	// 	component: Login,
-	// 	children: [
-	// 		{ path: '', name: 'LoginHome', component: LoginHome },
-	// 	]
-	// },
 	{
 		path: '/',
 		name: 'List',
@@ -26,7 +18,7 @@ const routes: Array<RouteRecordRaw> = [
 	},
 
 	// will match everything and put it under `$route.params.pathMatch`
-	{ path: '/:pathMatch(.*)*', redirect: '/home' },
+	{ path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
 export default routes
