@@ -28,6 +28,7 @@ export enum ToolType
 	NOTATION = 'notation',
 	LINE = 'line',
 	AREA = 'area',
+	ELEVATION = 'elevation'
 }
 
 // 测量工具名称
@@ -36,6 +37,7 @@ export enum ToolTitle
 	NOTATION = '标注工具',
 	LINE = '距离工具',
 	AREA = '面积工具',
+	ELEVATION = '高程点区域',
 }
 
 // 实体标记色
@@ -75,4 +77,20 @@ export interface EntityTreeChild extends Omit<TreeDataItem, 'key'>
 	color: EntityColor;
 	type: ToolType;
 	position: PositionMaker[];
+}
+
+export interface ElevationPoint 
+{
+	key: string;
+	title: string;
+	show: boolean;
+	showLabel: boolean;
+	children: ElevationPointEntity[];
+}
+
+export interface ElevationPointEntity
+{
+	key: string;
+	type: ToolType;
+	position: PositionMaker;
 }
