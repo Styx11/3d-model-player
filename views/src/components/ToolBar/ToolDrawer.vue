@@ -2,44 +2,22 @@
 	<div class="tool_drawer" :class="{ expanded: drawerVisible }">
 		<section class="drawer_wrapper" :class="{ expanded: drawerVisible }">
 			<header class="drawer_header">
-				<p class="header_title">浏览测量模式</p>
-				<section class="header_watcher">
-					<EyeFilled :style="{cursor: 'pointer'}" />
-				</section>
+				<template v-if="drawerType === 'measure'">
+					<p class="header_title">浏览测量模式</p>
+					<section class="header_watcher">
+						<EyeFilled :style="{cursor: 'pointer'}" />
+					</section>
+				</template>
+				<template v-else-if="drawerType === 'elevation'">
+					<p class="header_title">高程点提取模式</p>
+				</template>
 			</header>
 			<section class="drawer_body">
-				<div class="body_tree" v-if="treeData && !dataEmpty">
-					<Tree :tree-data="treeData" blockNode :selectable="false" defaultExpandAll>
-						<template #title="titleData">
-							<Icon
-								v-if="!titleData.isLeaf"
-								:name="`ic-${titleData.key}-${titleData.expanded? 'selected' :'regular'}`"
-								:width="26"
-								:height="26"
-							/>
-							<Badge v-else :color="titleData.color" />
-							<span class="tree_title">{{titleData.title}}</span>
-							<div class="tree_icons" v-if="titleData.isLeaf">
-								<Icon
-									name="ic-trash"
-									:width="18"
-									:height="18"
-									@click="handleEntityDel(titleData.type, titleData.key)"
-									:interactive="true"
-								/>
-								<EyeFilled
-									:style="{cursor: 'pointer'}"
-									@click.prevent="handleEntityCheck(titleData)"
-									v-if="selectedEntity.key !== titleData.key"
-								/>
-								<EyeInvisibleOutlined
-									v-else
-									:style="{cursor: 'pointer'}"
-									@click.prevent="handleEntityCheck(titleData, true)"
-								/>
-							</div>
-						</template>
-					</Tree>
+				<div v-if="!treeDataEmpty && drawerType === 'measure'">
+					<MeasureInner />
+				</div>
+				<div v-else-if="drawerType === 'elevation' && !elevationDataEmpty">
+					<ElevationInner />
 				</div>
 				<div class="body_empty_message" v-else>
 					暂无数据
@@ -53,147 +31,51 @@
 		<div class="drawer_info" v-if="selectedEntity.key">
 			<EntityInfo />
 		</div>
+		<div class="drawer_info" v-else-if="selectedTool === 'elevation'">
+			<ElevationTool />
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent, ref, reactive, computed, watch } from 'vue'
-	import { Tree, Badge } from 'ant-design-vue'
-	import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
-	import { RightOutlined, EyeFilled, EyeInvisibleOutlined } from '@ant-design/icons-vue'
+	import { defineComponent, ref, computed, watch } from 'vue'
+	import { RightOutlined, EyeFilled } from '@ant-design/icons-vue'
 
 	import { useStore } from '../../store'
 	import EntityInfo from './EntityInfo.vue'
-	import { removeEntity, removeTempPoint, removeTempPolyline, updateSelectedEntity } from '../../hooks/cesium'
+	import ElevationTool from './ElevationTool.vue'
+	import ElevationInner from './Inner/Elevation.vue'
+	import MeasureInner from './Inner/Measure.vue'
+	import { updateSelectedEntity } from '../../hooks/cesium'
 	import { CesiumEntityMutation } from '../../store/entity'
-	import { EntityTreeChild, ToolType } from '../../interface/Types'
-
-	const rawTreeData: TreeDataItem[] = [
-		{
-			title: '标注工具',
-			key: 'notation',
-			slots: { title: 'title' },
-			children: [
-				{
-					title: '标注 1-0',
-					key: '0-0-0',
-					color: 'red',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-				{
-					title: 'Earent 1-1',
-					key: '0-0-1',
-					color: 'orange',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-			],
-		},
-		{
-			title: '距离工具',
-			key: 'line',
-			slots: { title: 'title' },
-			children: [
-				{
-					title: '测量 1-0',
-					key: 'qwer',
-					color: 'yellow',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-				{
-					title: 'Earent 1-1',
-					key: '0wer',
-					color: 'green',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-			],
-		},
-		{
-			title: '面积工具',
-			key: 'area',
-			slots: { title: 'title' },
-			children: [
-				{
-					title: '面积 1-0',
-					key: 'qwesr',
-					color: 'blue',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-				{
-					title: 'Earent 1-1',
-					key: '0wedr',
-					color: 'purple',
-					slots: { title: 'title' },
-					isLeaf: true
-				},
-			],
-		},
-	];
+	import { ToolType } from '../../interface/Types'
 
 	export default defineComponent({
 		name: 'ToolDrawer',
 		components: {
 			RightOutlined,
-			EyeInvisibleOutlined,
-			EntityInfo,
 			EyeFilled,
-			Badge,
-			Tree,
+			EntityInfo,
+			ElevationTool,
+			ElevationInner,
+			MeasureInner,
 		},
 		props: {
-
 		},
-		setup(props)
+		setup()
 		{
 			const store = useStore()
-			const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
+			const selectedTool = computed(() => store.state.selectedTool)
 			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
 			const treeData = computed(() => store.state.cesiumEntity.entityList)
-			const dataEmpty = computed(() => treeData.value.every(d => !d.children.length))
-			const colors = reactive<string[]>(['red', 'orange', 'yellow', 'green', 'blue', 'purple'])
+			const treeDataEmpty = computed(() => treeData.value.every(d => !d.children.length))
+			const elevationDataEmpty = computed(() => !store.state.elevationPointList.list.length)
 
-			const drawerVisible = ref<boolean>(!!(treeData.value && treeData.value.length))
+			const drawerType = ref<'measure' | 'elevation'>('measure')
+			const drawerVisible = ref<boolean>(false)
 			const toggleDrawerVisible = () => drawerVisible.value = !drawerVisible.value
 
-			const handleEntityDel = (type: ToolType, key: string) =>
-			{
-				store.commit(CesiumEntityMutation.REMOVE_ENTITY, { type, key })
-				removeEntity(key)
-				if (type === ToolType.LINE)
-				{
-					removeTempPoint()
-				}
-				else if (type === ToolType.AREA)
-				{
-					removeTempPolyline()
-				}
-			}
-			const handleEntityCheck = (titleData: EntityTreeChild, uncheck?: boolean) =>
-			{
-				// 切换至另一个实体
-				if (!uncheck)
-				{
-					// 取消选中旧实体
-					if (selectedEntity.value.key)
-					{
-						updateSelectedEntity(selectedEntity.value.type, selectedEntity.value, false)
-					}
-					store.commit(CesiumEntityMutation.SEL_ENTITY, titleData)
-					updateSelectedEntity(titleData.type, titleData, true)
-				}
-				// 取消选中
-				else
-				{
-					store.commit(CesiumEntityMutation.UNSEL_ENTITY, selectedEntity.value.type)
-					updateSelectedEntity(titleData.type, titleData, false)
-				}
-			}
-
-			watch(selectedTool, () =>
+			watch(selectedTool, (tool, prevTool) =>
 			{
 				// 取消选中旧实体
 				if (selectedEntity.value.key)
@@ -201,18 +83,29 @@
 					updateSelectedEntity(selectedEntity.value.type, selectedEntity.value, false)
 				}
 				store.commit(CesiumEntityMutation.UNSEL_ENTITY, selectedEntity.value.type)
+
+				// drawer 展示内容
+				if (tool)
+				{
+					if (tool === ToolType.NOTATION || tool === ToolType.LINE || tool === ToolType.AREA)
+					{
+						drawerType.value = 'measure'
+					}
+					else if (tool === ToolType.ELEVATION)
+					{
+						drawerType.value = 'elevation'
+					}
+				}
 			})
 
 			return {
-				colors,
-				treeData,
-				dataEmpty,
+				treeDataEmpty,
+				drawerType,
 				drawerVisible,
+				selectedTool,
 				selectedEntity,
+				elevationDataEmpty,
 				toggleDrawerVisible,
-
-				handleEntityDel,
-				handleEntityCheck,
 			}
 		}
 	})

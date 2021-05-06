@@ -7,13 +7,11 @@ import { EntityTreeItem, EntityTreeChild, ToolType, ToolTitle, EntityColor } fro
 export interface CesiumEntity
 {
 	entityList: Array<EntityTreeItem>;
-	selectedTool: ToolType | '';
 	selectedEntity: EntityTreeChild;
 }
 
 export enum CesiumEntityMutation
 {
-	SEL_TOOL = 'cesiumEntity/selectTool',
 	SEL_ENTITY = 'cesiumEntity/selectEntity',
 	UNSEL_ENTITY = 'cesiumEntity/unselectEntity',
 	INIT_ENTITY = 'cesiumEntity/initEntity',
@@ -25,7 +23,6 @@ export enum CesiumEntityMutation
 export const entity: Module<CesiumEntity, RootState> = {
 	namespaced: true,
 	state: {
-		selectedTool: '',
 		selectedEntity: {
 			key: '',
 			title: '标注工具 - 1',
@@ -54,11 +51,6 @@ export const entity: Module<CesiumEntity, RootState> = {
 		}],
 	},
 	mutations: {
-		selectTool(state: CesiumEntity, tool: ToolType | '')
-		{
-			state.selectedTool = tool
-			console.log('select tool =>', tool)
-		},
 		selectEntity(state: CesiumEntity, entity: EntityTreeChild)
 		{
 			Object.assign(state.selectedEntity, entity)

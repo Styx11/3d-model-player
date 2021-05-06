@@ -3,24 +3,33 @@
 		<div
 			v-for="t in tools"
 			:key="t"
-			:class="['tool_item', selected && selected === t ? 'selected_tool' : '']"
+			:class="['tool_item', selectedTool && selectedTool === t ? 'selected_tool' : '']"
 			@click="selectTool(t)"
 		>
 			<Icon :name="`ic-${t}`" :width="20" :height="20" />
+		</div>
+		<Divider style="{{ margin: 0 }}" />
+		<div
+			:class="['tool_item', selectedTool && selectedTool === 'elevation' ? 'selected_tool' : '']"
+			@click="selectTool('elevation')"
+		>
+			<Icon name="ic-elevation" :width="20" :height="20" />
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 	import { defineComponent, reactive, computed } from 'vue'
+	import { Divider } from 'ant-design-vue'
 
 	import { useStore } from '../../store'
-	import { CesiumEntityMutation } from '../../store/entity'
+	import { RootStateMutation } from '../../store'
 	import { ToolType } from '../../interface/Types'
 
 	export default defineComponent({
 		name: 'Toolbar',
 		components: {
+			Divider,
 		},
 		props: {
 		},
@@ -29,18 +38,18 @@
 			const store = useStore()
 
 			// 选中的工具
-			const selected = computed(() => store.state.cesiumEntity.selectedTool)
+			const selectedTool = computed(() => store.state.selectedTool)
 
 			// 工具名列表
-			const tools = computed(() => store.state.cesiumEntity.entityList.map(e => e.key))
+			const tools = reactive<ToolType[]>([ToolType.NOTATION, ToolType.LINE, ToolType.AREA])
 
 			// 选择工具
-			const setSelected = (t: ToolType | '') => store.commit(CesiumEntityMutation.SEL_TOOL, t)
-			const selectTool = (t: ToolType) => selected.value && selected.value === t ? setSelected('') : setSelected(t)
+			const setSelected = (t: ToolType | '') => store.commit(RootStateMutation.SEL_TOOL, t)
+			const selectTool = (t: ToolType) => selectedTool.value && selectedTool.value === t ? setSelected('') : setSelected(t)
 
 			return {
 				tools,
-				selected,
+				selectedTool,
 				selectTool,
 			}
 		},
@@ -62,6 +71,10 @@
 		border-right: 1px solid @BLUE0;
 		border-top: 1px solid @BLUE0;
 		.flexContainer(column, flex-start);
+
+		::v-deep(.ant-divider-horizontal) {
+			background: @BLUE0;
+		}
 
 		.tool_item {
 			display: inline-block;

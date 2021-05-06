@@ -89,7 +89,7 @@
 			const store = useStore()
 
 			// 选中的工具
-			const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
+			const selectedTool = computed(() => store.state.selectedTool)
 
 			// 选中视角
 			const selectedTab = computed(() => store.state.selectedTab)

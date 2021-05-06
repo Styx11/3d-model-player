@@ -4,7 +4,7 @@ import { uid } from 'uid'
 
 import { throttle, calcDistanceCartesian3 } from '../hooks/util'
 import { Store } from 'vuex';
-import { AllState } from '../store';
+import { AllState, RootStateMutation } from '../store';
 import { ToolType, EntityTreeChild, EntityColor, ToolTitle } from '../interface/Types';
 import { CesiumEntityMutation } from '../store/entity';
 
@@ -54,7 +54,6 @@ export const initViewer = (viewerRef: Ref<any>): Cesium.Viewer =>
 		timeline: false,
 		homeButton: false,
 		geocoder: false,
-		navigationHelpButton: false,
 		fullscreenButton: false,
 	});
 
@@ -144,7 +143,7 @@ export const usePosition = (position: PositionMaker, screenPosition: ScreenPosit
 // 处理 handler click 进行创建 entity
 export const useClick = (position: PositionMaker, store: Store<AllState>): (e) => void =>
 {
-	const selectedTool = computed(() => store.state.cesiumEntity.selectedTool)
+	const selectedTool = computed(() => store.state.selectedTool)
 	// 未创建完毕就切换工具类型，则不会保存这次的内容
 	watch(selectedTool, (newVal, oldVal) =>
 	{
@@ -177,7 +176,7 @@ export const useClick = (position: PositionMaker, store: Store<AllState>): (e) =
 			{
 				case ToolType.NOTATION:
 					createPoint(_position, key, EntityColor.RED);
-					store.commit(CesiumEntityMutation.SEL_TOOL, '');
+					store.commit(RootStateMutation.SEL_TOOL, '');
 					store.commit(CesiumEntityMutation.ADD_ENTITY, {
 						type: ToolType.NOTATION,
 						child: {
@@ -212,7 +211,7 @@ export const useRightClick = (position: PositionMaker, store: Store<AllState>): 
 	return (e) =>
 	{
 		const _position = Object.assign({}, toRaw(position))
-		const selectedTool = store.state.cesiumEntity.selectedTool
+		const selectedTool = store.state.selectedTool
 		const picked = _viewer.scene.pick(e.position)
 		if (Cesium.defined(picked) && picked.id instanceof Cesium.Entity && selectedTool)
 		{
@@ -325,7 +324,7 @@ const endPolyline = (store: Store<AllState>, dirty?: boolean) =>
 	}
 	else
 	{
-		store.commit(CesiumEntityMutation.SEL_TOOL, '')
+		store.commit(RootStateMutation.SEL_TOOL, '')
 		store.commit(CesiumEntityMutation.ADD_ENTITY, {
 			type: ToolType.LINE,
 			child: {
@@ -426,7 +425,7 @@ const endPolygon = (store: Store<AllState>, dirty?: boolean) =>
 	{
 		_tempPolygon.positions.push(Object.assign({}, _tempPolygon.positions[0]))
 		// 提交commit
-		store.commit(CesiumEntityMutation.SEL_TOOL, '')
+		store.commit(RootStateMutation.SEL_TOOL, '')
 		store.commit(CesiumEntityMutation.ADD_ENTITY, {
 			type: ToolType.AREA,
 			child: {
