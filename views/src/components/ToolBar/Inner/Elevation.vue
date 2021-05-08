@@ -1,47 +1,115 @@
 <template>
 	<div class="elevation_inner">
 		<main class="elevation_main">
-			<div class="elevation_item">
-				<span class="item_title">高程点区域 1</span>
+			<div class="elevation_item" v-for="ep in elevationPointList" :key="ep.key">
+				<span class="item_title">{{ep.title}}</span>
 				<span class="item_icons">
 					<Icon name="ic-download" :width="18" :height="18" interactive />
-					<Icon name="ic-trash" :width="18" :height="18" interactive />
-					<Icon name="ic-eye" :width="18" :height="18" interactive />
-					<Icon name="ic-display-data" :width="18" :height="18" interactive />
-				</span>
-			</div>
-			<div class="elevation_item">
-				<span class="item_title">高程点区域 1</span>
-				<span class="item_icons">
-					<Icon name="ic-download" :width="18" :height="18" interactive />
-					<Icon name="ic-trash" :width="18" :height="18" interactive />
-					<Icon name="ic-eye" :width="18" :height="18" interactive />
-					<Icon name="ic-display-data" :width="18" :height="18" interactive />
-				</span>
-			</div>
-			<div class="elevation_item">
-				<span class="item_title">高程点区域 1</span>
-				<span class="item_icons">
-					<Icon name="ic-download" :width="18" :height="18" interactive />
-					<Icon name="ic-trash" :width="18" :height="18" interactive />
-					<Icon name="ic-eye" :width="18" :height="18" interactive />
-					<Icon name="ic-display-data" :width="18" :height="18" interactive />
+					<Icon name="ic-trash" :width="18" :height="18" interactive @click="confirmDel(ep)" />
+					<Icon
+						name="ic-eye"
+						:width="18"
+						:height="18"
+						interactive
+						v-if="ep.show"
+						@click="handleHidePoint(ep)"
+					/>
+					<Icon
+						name="ic-hidden-eye"
+						:width="18"
+						:height="18"
+						interactive
+						v-else
+						@click="handleHidePoint(ep)"
+					/>
+					<Icon
+						name="ic-display-data"
+						:width="18"
+						:height="18"
+						interactive
+						v-if="ep.showLabel"
+						@click="handleHideLabel(ep)"
+					/>
+					<Icon
+						name="ic-hidden-data"
+						:width="18"
+						:height="18"
+						interactive
+						v-else
+						@click="handleHideLabel(ep)"
+					/>
 				</span>
 			</div>
 		</main>
+		<footer class="elevation_footer">
+			<span style="margin: 0 6px;">
+				<Icon name="ic-batch-export" :width="18" :height="18" />
+			</span>
+			<span style="cursor: pointer;">批量导出</span>
+		</footer>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent } from 'vue'
+	import { defineComponent, createVNode, computed, toRaw } from 'vue'
+	import { Modal } from 'ant-design-vue'
+	import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+
+	import { useStore } from '@/store'
+	import { ElevationPoint } from '@/interface/Types'
+	import { ElevationPointMutation } from '@/store/elevation'
+	import { removeEntity, toggleElevationPointLabel, toggleElevationPoint } from '@/hooks/cesium'
 
 	export default defineComponent({
 		name: 'ElevationInner',
 		components: {
+
 		},
 		setup()
 		{
+			const store = useStore()
+			const elevationPointList = computed(() => store.state.elevationPoint.list)
 
+			const confirmDel = (point: ElevationPoint) =>
+			{
+				Modal.confirm({
+					title: '确认删除该高程点区域？',
+					icon: createVNode(ExclamationCircleOutlined),
+					content: '该操作是无法撤销的',
+					onOk()
+					{
+						point.children.forEach(p => removeEntity(p.key))
+						return store.commit(ElevationPointMutation.REMOVE_ELEVATION, point.key)
+					},
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					onCancel() { },
+				});
+			}
+
+			const handleHideLabel = (point: ElevationPoint) =>
+			{
+				if (!point.show) return
+				const rawPoint = toRaw(point)
+				const _point = Object.assign({}, rawPoint, { showLabel: !rawPoint.showLabel })
+				toggleElevationPointLabel(_point.children, _point.showLabel)
+				store.commit(ElevationPointMutation.UPDATE_ELEVATION, _point)
+			}
+
+			const handleHidePoint = (point: ElevationPoint) =>
+			{
+				const rawPoint = toRaw(point)
+				const _point = Object.assign({}, rawPoint, { show: !rawPoint.show, showLabel: !rawPoint.showLabel })
+				toggleElevationPoint(_point.children, _point.show)
+				store.commit(ElevationPointMutation.UPDATE_ELEVATION, _point)
+			}
+
+			return {
+				elevationPointList,
+				handleHideLabel,
+				handleHidePoint,
+
+				confirmDel,
+			}
 		},
 	})
 </script>
@@ -54,13 +122,13 @@
 	.elevation_inner {
 		width: 100%;
 		height: 100%;
-		.flexContainer(column);
+		.flexContainer(column, flex-start);
 
 		.elevation_main {
-			height: 100%;
 			width: 100%;
-			flex: 1 1 auto;
+			height: 91.8%;
 			overflow: auto;
+			padding: 6px 8px;
 			.scrollBar(8px);
 
 			.elevation_item {
@@ -100,6 +168,15 @@
 					}
 				}
 			}
+		}
+
+		.elevation_footer {
+			width: 100%;
+			height: 41px;
+			padding: 6px 16px;
+			border-top: 1px solid @BLUE0;
+			.flexContainer(row, flex-end);
+			.label(12px, @WHITE_COLOR);
 		}
 	}
 </style>
