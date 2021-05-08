@@ -13,12 +13,8 @@
 				</template>
 			</header>
 			<section class="drawer_body">
-				<div v-if="!treeDataEmpty && drawerType === 'measure'">
-					<MeasureInner />
-				</div>
-				<div v-else-if="drawerType === 'elevation' && !elevationDataEmpty">
-					<ElevationInner />
-				</div>
+				<MeasureInner v-if="!treeDataEmpty && drawerType === 'measure'" />
+				<ElevationInner v-else-if="drawerType === 'elevation' && !elevationDataEmpty" />
 				<div class="body_empty_message" v-else>
 					暂无数据
 					<br />点击模型开始测量
@@ -69,10 +65,10 @@
 			const selectedEntity = computed(() => store.state.cesiumEntity.selectedEntity)
 			const treeData = computed(() => store.state.cesiumEntity.entityList)
 			const treeDataEmpty = computed(() => treeData.value.every(d => !d.children.length))
-			const elevationDataEmpty = computed(() => !store.state.elevationPointList.list.length)
+			const elevationDataEmpty = computed(() => !store.state.elevationPoint.list.length)
 
 			const drawerType = ref<'measure' | 'elevation'>('measure')
-			const drawerVisible = ref<boolean>(false)
+			const drawerVisible = ref<boolean>(true)
 			const toggleDrawerVisible = () => drawerVisible.value = !drawerVisible.value
 
 			watch(selectedTool, (tool, prevTool) =>
@@ -193,77 +189,12 @@
 				width: 100%;
 				height: 100%;
 				flex: 1 1 auto;
-				padding: 6px 8px;
-				overflow: auto;
-				.scrollBar(8px);
 				.body_empty_message {
 					position: relative;
 					.label(14px, rgba(255, 255, 255, 0.6));
 					text-align: center;
 					top: 106px;
 					padding: 0 15px;
-				}
-				.body_tree {
-					width: 100%;
-					height: 100%;
-
-					.tree_title {
-						margin-left: 8px;
-						flex: 1 1 auto;
-					}
-
-					.tree_icons {
-						display: inline-flex;
-						height: 100%;
-						width: 40px;
-						.flexContainer(row, space-between);
-					}
-
-					::v-deep(.ant-tree) {
-						color: @WHITE_COLOR;
-						cursor: pointer;
-
-						.ant-tree-switcher {
-							display: inline-block;
-
-							.ant-tree-switcher-icon {
-								margin-top: 8px;
-							}
-						}
-
-						.ant-tree-node-content-wrapper {
-							height: 30px;
-							color: @WHITE_COLOR;
-							position: relative;
-							.label(14px, @WHITE_COLOR);
-
-							&:hover {
-								background: rgba(34, 52, 71, 0.9);
-							}
-
-							svg:hover {
-								path {
-									fill: @PRIMARY_COlOR;
-								}
-							}
-
-							.ant-tree-title {
-								height: 100%;
-								.flexContainer(row);
-
-								.ant-badge {
-									width: 16px;
-									height: 16px;
-									.flexContainer(column, center);
-
-									.ant-badge-status-dot {
-										width: 8px;
-										height: 8px;
-									}
-								}
-							}
-						}
-					}
 				}
 			}
 		}

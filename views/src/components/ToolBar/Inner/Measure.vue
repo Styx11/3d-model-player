@@ -35,9 +35,9 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent, computed } from 'vue'
-	import { Tree, Badge } from 'ant-design-vue'
-	import { RightOutlined, EyeFilled, EyeInvisibleOutlined } from '@ant-design/icons-vue'
+	import { defineComponent, computed, createVNode } from 'vue'
+	import { Tree, Badge, Modal } from 'ant-design-vue'
+	import { RightOutlined, EyeFilled, EyeInvisibleOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 
 	import { useStore } from '@/store'
 	import EntityInfo from '../EntityInfo.vue'
@@ -67,16 +67,26 @@
 
 			const handleEntityDel = (type: ToolType, key: string) =>
 			{
-				store.commit(CesiumEntityMutation.REMOVE_ENTITY, { type, key })
-				removeEntity(key)
-				if (type === ToolType.LINE)
-				{
-					removeTempPoint()
-				}
-				else if (type === ToolType.AREA)
-				{
-					removeTempPolyline()
-				}
+				Modal.confirm({
+					title: '确认删除该测量实体？',
+					icon: createVNode(ExclamationCircleOutlined),
+					content: '该操作是无法撤销的',
+					onOk()
+					{
+						store.commit(CesiumEntityMutation.REMOVE_ENTITY, { type, key })
+						removeEntity(key)
+						if (type === ToolType.LINE)
+						{
+							removeTempPoint()
+						}
+						else if (type === ToolType.AREA)
+						{
+							removeTempPolyline()
+						}
+					},
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					onCancel() { },
+				});
 			}
 			const handleEntityCheck = (titleData: EntityTreeChild, uncheck?: boolean) =>
 			{
@@ -118,6 +128,10 @@
 	.body_tree {
 		width: 100%;
 		height: 100%;
+		padding: 6px 8px;
+		flex: 1 1 auto;
+		overflow: auto;
+		.scrollBar(6px);
 
 		.tree_title {
 			margin-left: 8px;

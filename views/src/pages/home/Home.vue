@@ -38,7 +38,6 @@
 
 			const uid = computed(() => route.query.uid)
 			const model = computed(() => store.state.modelFile.fileList.filter(f => f.uid === uid.value)[0])
-			console.log('model =>', model)
 
 			return {
 				model,
