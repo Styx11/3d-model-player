@@ -30,7 +30,7 @@ export interface AllState extends RootState
 	spinning: boolean;
 	modelFile: ModelFile;
 	cesiumEntity: CesiumEntity;
-	elevationPointList: ElevationPointList;
+	elevationPoint: ElevationPointList;
 }
 
 export const key: InjectionKey<Store<RootState>> = Symbol('vue-store')
@@ -47,7 +47,7 @@ export default createStore<RootState>({
 	modules: {
 		modelFile: file,
 		cesiumEntity: entity,
-		elevationPointList: elevation,
+		elevationPoint: elevation,
 	},
 	state: {
 		selectedTool: '',

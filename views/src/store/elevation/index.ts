@@ -3,21 +3,23 @@
 import { toRaw } from 'vue'
 import { Module } from 'vuex'
 import { RootState } from '../index'
-import { ElevationPoint, ToolType } from '../../interface/Types'
+import { ElevationPoint } from '@/interface/Types'
 
 export interface ElevationPointList
 {
 	list: ElevationPoint[];
 }
 
-export enum ElevationPointListMutation
+export enum ElevationPointMutation
 {
-	INIT_ELEVATION = 'elevation/initElevationList',
-	ADD_ELEVATION = 'elevation/addElevationPoint',
-	REMOVE_ELEVATION = 'elevation/removeElevationPoint',
+	INIT_ELEVATION = 'elevationPoint/initElevationList',
+	ADD_ELEVATION = 'elevationPoint/addElevationPoint',
+	UPDATE_ELEVATION = 'elevationPoint/updateElevationPoint',
+	REMOVE_ELEVATION = 'elevationPoint/removeElevationPoint',
 }
 
 export const elevation: Module<ElevationPointList, RootState> = {
+	namespaced: true,
 	state: {
 		list: [],
 	},
@@ -32,6 +34,17 @@ export const elevation: Module<ElevationPointList, RootState> = {
 			state.list.push(payload)
 			console.log('add elevation point =>', toRaw(payload))
 		},
+		updateElevationPoint(state: ElevationPointList, payload: ElevationPoint)
+		{
+			for (let i = 0; i < state.list.length; i++)
+			{
+				if (state.list[i].key === payload.key)
+				{
+					state.list.splice(i, 1, payload)
+					console.log('update elevation point =>', payload)
+				}
+			}
+		},
 		removeElevationPoint(state: ElevationPointList, key: string)
 		{
 			for (let i = 0; i < state.list.length; i++)
@@ -39,6 +52,7 @@ export const elevation: Module<ElevationPointList, RootState> = {
 				if (state.list[i].key === key)
 				{
 					state.list.splice(i, 1)
+					console.log('remove elevation point =>', key)
 				}
 			}
 		}
