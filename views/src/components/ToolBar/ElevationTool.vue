@@ -4,7 +4,7 @@
 			<template #title>
 				<span>保存</span>
 			</template>
-			<span class="operation_item">
+			<span class="operation_item" @click="handleEnd">
 				<Icon name="ic-store" :width="20" :height="20" interactive />
 			</span>
 		</Tooltip>
@@ -13,16 +13,17 @@
 			<template #title>
 				<span>撤销</span>
 			</template>
-			<span class="operation_item">
+			<span class="operation_item" @click="handleRevoke">
 				<Icon name="ic-revoke" :width="20" :height="20" interactive />
 			</span>
 		</Tooltip>
 		<Divider type="vertical" style="{{ margin: 0 }}" />
 		<Tooltip placement="bottom">
 			<template #title>
-				<span>隐藏标签</span>
+				<span v-if="showLabel">隐藏标签</span>
+				<span v-else>显示标签</span>
 			</template>
-			<span class="operation_item">
+			<span class="operation_item" @click="handleHide">
 				<Icon name="ic-coordinate-display" :width="20" :height="20" interactive />
 			</span>
 		</Tooltip>
@@ -30,8 +31,11 @@
 </template>
 
 <script lang="ts">
-	import { defineComponent } from 'vue'
+	import { defineComponent, ref } from 'vue'
 	import { Tooltip, Divider } from 'ant-design-vue'
+
+	import { useStore } from '@/store'
+	import { revokeElevationPoint, endElevationPoint, toggleTempElevationPointLabel } from '@/hooks/cesium'
 
 	export default defineComponent({
 		components: {
@@ -40,7 +44,32 @@
 		},
 		setup()
 		{
+			const store = useStore()
+			const showLabel = ref<boolean>(true)
 
+			const handleRevoke = () =>
+			{
+				revokeElevationPoint()
+			}
+
+			const handleEnd = () =>
+			{
+				endElevationPoint(store)
+			}
+
+			const handleHide = () =>
+			{
+				showLabel.value = !showLabel.value
+				toggleTempElevationPointLabel(showLabel.value)
+			}
+
+			return {
+				handleRevoke,
+				handleEnd,
+				handleHide,
+
+				showLabel,
+			}
 		},
 	})
 </script>
