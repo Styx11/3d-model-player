@@ -3,10 +3,11 @@ import * as Cesium from 'cesium'
 import { uid } from 'uid'
 
 import { throttle, calcDistanceCartesian3 } from '../hooks/util'
-import { Store } from 'vuex';
-import { AllState, RootStateMutation } from '../store';
-import { ToolType, EntityTreeChild, EntityColor, ToolTitle } from '../interface/Types';
-import { CesiumEntityMutation } from '../store/entity';
+import { Store } from 'vuex'
+import { AllState, RootStateMutation } from '../store'
+import { ToolType, EntityTreeChild, EntityColor, ToolTitle, ElevationPoint, ElevationPointEntity } from '../interface/Types'
+import { CesiumEntityMutation } from '../store/entity'
+import { ElevationPointMutation } from '../store/elevation'
 
 let _viewer: Cesium.Viewer;
 
@@ -26,6 +27,9 @@ const _tempPolyline: { id: string; positions: PositionMaker[] } = {
 
 // 保存临时点，用于测量工具和面积工具的创建，创建中和查看时会将临时点保存在这里，并借助这些点信息销毁他们
 const _tempPoint: Array<{ id: string; position: PositionMaker }> = []
+
+let _showElevationPointLabel = true
+const _tempElevationPoint: ElevationPointEntity[] = []
 
 // 位置指示器数据
 export interface PositionMaker
@@ -157,6 +161,9 @@ export const useClick = (position: PositionMaker, store: Store<AllState>): (e) =
 				case ToolType.AREA:
 					endPolygon(store, true)
 					break;
+				case ToolType.ELEVATION:
+					endElevationPoint(store, true)
+					break;
 				default:
 					break
 			}
@@ -196,6 +203,9 @@ export const useClick = (position: PositionMaker, store: Store<AllState>): (e) =
 					return;
 				case ToolType.AREA:
 					createPolygon(_position, key, EntityColor.RED);
+					return;
+				case ToolType.ELEVATION:
+					createElevationPoint(_position, key);
 					return;
 				default:
 					break;
@@ -338,7 +348,6 @@ const endPolyline = (store: Store<AllState>, dirty?: boolean) =>
 				slots: { title: 'title' },
 			} as EntityTreeChild
 		});
-		//... 提交 commit
 	}
 
 	_tempPolyline.id = ''
@@ -596,4 +605,111 @@ export const updateSelectedEntity = (type: ToolType, value: EntityTreeChild, sel
 		default:
 			break;
 	}
+}
+
+// 创建高程点
+const createElevationPoint = (position: PositionMaker, key: string) =>
+{
+	const labelText = `东：${position.y.toFixed(5)}\n北：${position.x.toFixed(5)}\n高：${position.z.toFixed(4)}`
+
+	const ep = _viewer.entities.add({
+		id: key,
+		position: _vision === 'ortho' ? Object.assign({}, position.cartesian, { z: position.cartesian.z + 0.8 }) : position.cartesian,
+		billboard: {
+			image: `/static/svg/ic-biaoji.svg`,
+			width: 18,
+			height: 18,
+			verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+		},
+		label: {
+			text: labelText,
+			style: Cesium.LabelStyle.FILL,
+			outlineWidth: 2,
+			font: 'normal 32px PingFangSC MicroSoft YaHei',
+			verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+			pixelOffset: new Cesium.Cartesian2(9, -9),
+			backgroundColor: new Cesium.Color(0, 0, 0, 0.5),
+			backgroundPadding: new Cesium.Cartesian2(18, 18),
+			horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+			showBackground: true,
+			outlineColor: Cesium.Color.WHITE,
+			scale: 0.4,
+			show: _showElevationPointLabel,
+			scaleByDistance: new Cesium.NearFarScalar(10000000, 1, 10000001, 0.0)
+		}
+	})
+	_tempElevationPoint.push({
+		key,
+		position,
+		type: ToolType.ELEVATION,
+	})
+	return ep
+}
+
+// 结束高程点绘制
+export const endElevationPoint = (store: Store<AllState>, dirty?: boolean) =>
+{
+	if (!_tempElevationPoint.length) return
+	if (dirty)
+	{
+		_tempElevationPoint.forEach(ep => removeEntity(ep.key))
+	}
+	else
+	{
+		// store commit...
+		const key = uid()
+		const list = computed(() => store.state.elevationPoint.list)
+		store.commit(RootStateMutation.SEL_TOOL, '')
+		store.commit(ElevationPointMutation.ADD_ELEVATION, {
+			key,
+			title: '高程点区域 ' + Number(list.value.length + 1),
+			show: true,
+			showLabel: true,
+			children: [..._tempElevationPoint]
+		} as ElevationPoint)
+	}
+
+	_tempElevationPoint.splice(0, _tempElevationPoint.length)
+}
+
+// 绘制中：撤销上一个高程点
+export const revokeElevationPoint = () =>
+{
+	if (!_tempElevationPoint.length) return
+
+	removeEntity(_tempElevationPoint.pop().key)
+}
+
+// 绘制中：显示/隐藏 label
+export const toggleTempElevationPointLabel = (show: boolean) =>
+{
+	if (!_tempElevationPoint.length) return
+
+	_tempElevationPoint.forEach(ep =>
+	{
+		_showElevationPointLabel = show
+		const point = _viewer.entities.getById(ep.key)
+		point.label.show = new Cesium.ConstantProperty(show)
+	})
+}
+
+// 隐藏/显示标签
+export const toggleElevationPointLabel = (children: ElevationPointEntity[], show: boolean) =>
+{
+	children.forEach(p =>
+	{
+		const point = _viewer.entities.getById(p.key)
+		point.label.show = new Cesium.ConstantProperty(show)
+	})
+}
+
+// 隐藏/显示高程点（包括标签）
+export const toggleElevationPoint = (children: ElevationPointEntity[], show: boolean) =>
+{
+	children.forEach(p =>
+	{
+		const point = _viewer.entities.getById(p.key)
+		point.billboard.show = new Cesium.ConstantProperty(show)
+		point.label.show = new Cesium.ConstantProperty(show)
+	})
 }
