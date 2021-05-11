@@ -94,3 +94,12 @@ export interface ElevationPointEntity
 	type: ToolType;
 	position: PositionMaker;
 }
+
+// 坐标类型
+export enum ProjectionAlias
+{
+	WGS84 = 'WGS84',
+	EPSG_32650 = 'EPSG:32650',
+	// EPSG_3857 = 'GOOGLE',
+	LOCAL = 'EPSG:3857',
+}
