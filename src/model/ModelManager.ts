@@ -2,7 +2,7 @@ const fs = require('fs/promises')
 const rimraf = require('rimraf')
 const path = require('path')
 
-import * as AdmZip from 'adm-zip'
+import AdmZip from 'adm-zip'
 import { Paths } from '@main/constants/path'
 import { ModelFileState } from '@views/interface/Types'
 
