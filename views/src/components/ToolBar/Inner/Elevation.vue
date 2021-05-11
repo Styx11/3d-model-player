@@ -4,7 +4,7 @@
 			<div class="elevation_item" v-for="ep in elevationPointList" :key="ep.key">
 				<span class="item_title">{{ep.title}}</span>
 				<span class="item_icons">
-					<Icon name="ic-download" :width="18" :height="18" interactive />
+					<Icon name="ic-download" :width="18" :height="18" interactive @click="handleExport(ep)" />
 					<Icon name="ic-trash" :width="18" :height="18" interactive @click="confirmDel(ep)" />
 					<Icon
 						name="ic-eye"
@@ -45,17 +45,24 @@
 			<span style="margin: 0 6px;">
 				<Icon name="ic-batch-export" :width="18" :height="18" />
 			</span>
-			<span style="cursor: pointer;">批量导出</span>
+			<span class="batch_export" @click="handleBatchExport">批量导出</span>
 		</footer>
+		<ElevationExportModal v-model:show="showExportModal" :elevationPoint="exportPoint" />
+		<ElevationBatchExportModal
+			v-model:show="showBatchExportModal"
+			:elevationPointList="elevationPointList"
+		/>
 	</div>
 </template>
 
 <script lang="ts">
-	import { defineComponent, createVNode, computed, toRaw } from 'vue'
+	import { defineComponent, createVNode, computed, toRaw, ref, reactive } from 'vue'
 	import { Modal } from 'ant-design-vue'
 	import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 
 	import { useStore } from '@/store'
+	import ElevationExportModal from '@/components/ModalDialog/ElevationExport.vue'
+	import ElevationBatchExportModal from '@/components/ModalDialog/ElevationBatchExport.vue'
 	import { ElevationPoint } from '@/interface/Types'
 	import { ElevationPointMutation } from '@/store/elevation'
 	import { removeEntity, toggleElevationPointLabel, toggleElevationPoint } from '@/hooks/cesium'
@@ -63,12 +70,16 @@
 	export default defineComponent({
 		name: 'ElevationInner',
 		components: {
-
+			ElevationExportModal,
+			ElevationBatchExportModal,
 		},
 		setup()
 		{
 			const store = useStore()
 			const elevationPointList = computed(() => store.state.elevationPoint.list)
+			const showExportModal = ref<boolean>(false)
+			const showBatchExportModal = ref<boolean>(false)
+			const exportPoint = reactive({} as ElevationPoint)
 
 			const confirmDel = (point: ElevationPoint) =>
 			{
@@ -103,11 +114,27 @@
 				store.commit(ElevationPointMutation.UPDATE_ELEVATION, _point)
 			}
 
+			const handleExport = (point: ElevationPoint) =>
+			{
+				Object.assign(exportPoint, toRaw(point))
+				showExportModal.value = !showExportModal.value
+			}
+
+			const handleBatchExport = () =>
+			{
+				showBatchExportModal.value = !showBatchExportModal.value
+			}
+
 			return {
 				elevationPointList,
 				handleHideLabel,
 				handleHidePoint,
+				handleBatchExport,
+				handleExport,
 
+				showBatchExportModal,
+				showExportModal,
+				exportPoint,
 				confirmDel,
 			}
 		},
@@ -177,6 +204,15 @@
 			border-top: 1px solid @BLUE0;
 			.flexContainer(row, flex-end);
 			.label(12px, @WHITE_COLOR);
+
+			.batch_export {
+				cursor: pointer;
+				transition: all @ease-base-out @animation-duration-fast;
+
+				&:hover {
+					color: @PRIMARY_COlOR;
+				}
+			}
 		}
 	}
 </style>
