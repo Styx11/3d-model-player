@@ -67,9 +67,41 @@ export const entity: Module<CesiumEntity, RootState> = {
 			})
 			console.log('unselect entity!')
 		},
-		initEntity(state: CesiumEntity, payload: Array<EntityTreeItem>)
+		initEntity(state: CesiumEntity, payload?: Array<EntityTreeItem>)
 		{
-			state.entityList = payload
+			if (payload)
+			{
+				state.entityList = payload
+			}
+			else
+			{
+				state.selectedEntity = {
+					key: '',
+					title: '标注工具 - 1',
+					type: ToolType.NOTATION,
+					desc: '',
+					color: EntityColor.RED,
+					position: [],
+				}
+				state.entityList = [{
+					title: ToolTitle.NOTATION,
+					key: ToolType.NOTATION,
+					slots: { title: 'title' },
+					children: [],
+				},
+				{
+					title: ToolTitle.LINE,
+					key: ToolType.LINE,
+					slots: { title: 'title' },
+					children: [],
+				},
+				{
+					title: ToolTitle.AREA,
+					key: ToolType.AREA,
+					slots: { title: 'title' },
+					children: [],
+				}]
+			}
 			console.log('init entityList =>', toRaw(state.entityList))
 		},
 		addEntity(state: CesiumEntity, payload: { type: ToolType, child: EntityTreeChild })
@@ -78,7 +110,7 @@ export const entity: Module<CesiumEntity, RootState> = {
 			{
 				if (item.key === payload.type)
 				{
-					item.children.push(payload.child)
+					item.children.push(Object.assign(payload.child, { title: payload.child.title + " " + (item.children.length + 1) }))
 				}
 			})
 			console.log('state entityList =>', toRaw(state.entityList))

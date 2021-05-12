@@ -14,6 +14,7 @@ export enum ModelFileMutation
 	INIT_FILE = 'modelFile/initFile',
 	UPLOAD_FILE = 'modelFile/uploadFile',
 	REMOVE_FILE = 'modelFile/removeFile',
+	UPDATE_FILE = 'modelFile/updateFile',
 }
 
 export const file: Module<ModelFile, RootState> = {
@@ -41,6 +42,18 @@ export const file: Module<ModelFile, RootState> = {
 					state.fileList.splice(i, 1)
 				}
 			}
-		}
+		},
+		updateFile(state: ModelFile, payload: ModelFileState)
+		{
+			for (let i = 0; i < state.fileList.length; i++)
+			{
+				if (state.fileList[i].uid === payload.uid)
+				{
+					state.fileList.splice(i, 1, payload)
+					console.log('update fileList =>', payload)
+					break;
+				}
+			}
+		},
 	}
 }

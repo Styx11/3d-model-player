@@ -19,6 +19,7 @@ export enum RootStateMutation
 	SET_SPINNING = 'setSpinning',
 	SEL_TAB = 'selectTab',
 	SEL_TOOL = 'selectTool',
+	INIT_STATE = 'initState',
 }
 
 // vuex 模块化 typescript 支持
@@ -55,6 +56,11 @@ export default createStore<RootState>({
 		selectedTab: '3d',
 	},
 	mutations: {
+		initState(state: RootState)
+		{
+			state.selectedTab = '3d'
+			state.selectedTool = ''
+		},
 		setSpinning(state: RootState, spinning: boolean)
 		{
 			state.spinning = spinning
