@@ -63,6 +63,7 @@
 		ScreenPosition,
 		flyTo,
 		flyToInOrtho,
+		initEntity,
 	} from '../../../hooks/cesium'
 
 	Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiZjc1MGI5NC0wYTcyLTQ3YWYtYTNiMi03YmU5MjQ0ZTE1MDkiLCJpZCI6NDk1NjIsImlhdCI6MTYxNzQxNjIzMH0.OKpUIs85S_LatHupyCtso-ZtcpMjdrYVmSf61N93Ihg'
@@ -137,6 +138,8 @@
 
 					zoomToTileset(tileset)
 					tilesetReady.value = true
+
+					initEntity(store)
 				})
 			})
 
