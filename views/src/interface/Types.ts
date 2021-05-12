@@ -20,6 +20,8 @@ export interface ModelFileState extends IModelFormState
 	size: number;
 	uploadAt: number;
 	lastModified: number;
+	measureData?: EntityTreeItem[];     // 点线面测量工具数据
+	elevationData?: ElevationPoint[];   // 高程点测量工具数据
 }
 
 // 测量工具类型

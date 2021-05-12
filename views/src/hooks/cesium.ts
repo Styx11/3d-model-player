@@ -250,7 +250,6 @@ export const useRightClick = (position: PositionMaker, store: Store<AllState>): 
 						break;
 				}
 			}
-			// console.log('selected point =>', picked)
 		}
 	}
 }
@@ -320,7 +319,6 @@ const createPolyline = (position: PositionMaker, key: string, color: EntityColor
 				})
 			}
 		})
-		console.log('polyline =>', p)
 	}
 }
 
@@ -354,8 +352,6 @@ const endPolyline = (store: Store<AllState>, dirty?: boolean) =>
 	_tempPolyline.positions = []
 
 	removeTempPoint()
-
-	console.log('_tempPolyline =>', _tempPolyline)
 }
 
 // 更新线条颜色、聚焦线条、创建/销毁聚焦时的临时点
@@ -386,7 +382,6 @@ export const updatePolyline = (key: string, color: EntityColor, positions?: Posi
 		else
 		{
 			removeTempPoint()
-			console.log('_tempPoint removed =>', _tempPoint)
 		}
 	}
 }
@@ -419,7 +414,6 @@ const createPolygon = (position: PositionMaker, key: string, color: EntityColor)
 				material: Cesium.Color[color.toUpperCase()].withAlpha(0.3),
 			}
 		})
-		console.log('polygon =>', p)
 	}
 }
 
@@ -461,8 +455,6 @@ const endPolygon = (store: Store<AllState>, dirty?: boolean) =>
 
 	removeTempPolyline()
 	removeTempPoint()
-
-	console.log('_tempPolygon =>', _tempPolygon)
 }
 
 export const updatePolygon = (key: string, color: EntityColor, positions?: PositionMaker[], active?: boolean, nozoom?: boolean) =>
@@ -510,7 +502,6 @@ export const createTempPolyline = (positions: PositionMaker[], show?: boolean) =
 				material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE)
 			}
 		})
-		console.log('temporary polyline =>', p)
 	}
 }
 
@@ -555,7 +546,7 @@ export const createTempPoint = (position: PositionMaker, color: EntityColor, dir
 			font: 'normal 32px PingFangSC MicroSoft YaHei',
 			verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
 			pixelOffset: new Cesium.Cartesian2(0, -9),
-			backgroundColor: new Cesium.Color(0, 0, 0, 0.8),
+			backgroundColor: new Cesium.Color(0, 0, 0, 0.5),
 			backgroundPadding: new Cesium.Cartesian2(18, 18),
 			horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
 			showBackground: true,
@@ -711,5 +702,115 @@ export const toggleElevationPoint = (children: ElevationPointEntity[], show: boo
 		const point = _viewer.entities.getById(p.key)
 		point.billboard.show = new Cesium.ConstantProperty(show)
 		point.label.show = new Cesium.ConstantProperty(show)
+	})
+}
+
+
+// 初始化 model file state 数据后创建初始实体
+export const initEntity = (store: Store<AllState>) =>
+{
+	const entityDataList = computed(() => store.state.cesiumEntity.entityList)
+	const elevationDataList = computed(() => store.state.elevationPoint.list)
+
+	entityDataList.value.forEach((entityData) =>
+	{
+		switch (entityData.key)
+		{
+			case ToolType.NOTATION:
+				entityData.children.forEach(e =>
+				{
+					createPoint(e.position[0], e.key, e.color)
+				})
+				break;
+			case ToolType.LINE:
+				entityData.children.forEach(e =>
+				{
+					createInitialPolyline(e.position, e.key, e.color)
+				})
+				break;
+
+			case ToolType.AREA:
+				entityData.children.forEach(e =>
+				{
+					createInitialPolygon(e.position, e.key, e.color)
+				})
+				break;
+			default:
+				break;
+		}
+	})
+
+	elevationDataList.value.forEach(elevationPoint =>
+	{
+		createInitialElevationPoint(elevationPoint.children, elevationPoint.show, elevationPoint.showLabel)
+	})
+}
+
+// 初始化数据时创建线段
+const createInitialPolyline = (position: PositionMaker[], key: string, color: EntityColor) =>
+{
+	const p = _viewer.entities.add({
+		id: key,
+		polyline: {
+			positions: position.map(p => p.cartesian),
+			width: 2,
+			material: new Cesium.PolylineDashMaterialProperty({
+				color: Cesium.Color[color.toUpperCase()]
+			})
+		}
+	})
+	return p
+}
+
+// 初始化数据时创建面
+const createInitialPolygon = (position: PositionMaker[], key: string, color: EntityColor) =>
+{
+	const p = _viewer.entities.add({
+		id: key,
+		polygon: {
+			height: 39.8,
+			hierarchy: new Cesium.PolygonHierarchy(position.map(p => p.cartesian)),
+			material: Cesium.Color[color.toUpperCase()].withAlpha(0.3),
+		}
+	})
+	return p
+}
+
+// 初始化数据时创建高程点区域
+const createInitialElevationPoint = (children: ElevationPointEntity[], show: boolean, showLabel: boolean) =>
+{
+	if (!Array.isArray(children)) return
+	children.forEach(point =>
+	{
+		const position = point.position
+		const labelText = `东：${position.y.toFixed(5)}\n北：${position.x.toFixed(5)}\n高：${position.z.toFixed(4)}`
+
+		const ep = _viewer.entities.add({
+			id: point.key,
+			position: _vision === 'ortho' ? Object.assign({}, position.cartesian, { z: position.cartesian.z + 0.8 }) : position.cartesian,
+			billboard: {
+				image: `/static/svg/ic-biaoji.svg`,
+				width: 18,
+				height: 18,
+				show: show,
+				verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+			},
+			label: {
+				text: labelText,
+				style: Cesium.LabelStyle.FILL,
+				outlineWidth: 2,
+				font: 'normal 32px PingFangSC MicroSoft YaHei',
+				verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+				pixelOffset: new Cesium.Cartesian2(9, -9),
+				backgroundColor: new Cesium.Color(0, 0, 0, 0.5),
+				backgroundPadding: new Cesium.Cartesian2(18, 18),
+				horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+				showBackground: true,
+				outlineColor: Cesium.Color.WHITE,
+				scale: 0.4,
+				show: showLabel,
+				scaleByDistance: new Cesium.NearFarScalar(10000000, 1, 10000001, 0.0)
+			}
+		})
 	})
 }
