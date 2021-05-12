@@ -30,7 +30,14 @@ export default class IPCMainManager
 		{
 			const channel = IPCMainChannelName[key];
 
-			ipcMain.handle(channel, this.handleChannelEvent.bind(this, channel));
+			if (channel === IPCMainChannelName.UPDATE_MODEL_DESC)
+			{
+				ipcMain.on(channel, this.handleUpdateModelDesc.bind(this))
+			}
+			else
+			{
+				ipcMain.handle(channel, this.handleChannelEvent.bind(this, channel));
+			}
 		}
 	}
 
@@ -111,5 +118,19 @@ export default class IPCMainManager
 	{
 		if (!args[0]) return
 		return await ModelManager.getInstance().remove(args[0] as string)
+	}
+
+	/**
+	 * 同步更新模型描述文件
+	 * 
+	 * @param event - the event type
+	 * @param args - model: ModelFileState
+	 */
+	private handleUpdateModelDesc(event: Event, ...args)
+	{
+		if (!args[0]) event.returnValue = false
+
+		ModelManager.getInstance().updateDesc(args[0])
+		event.returnValue = true
 	}
 }

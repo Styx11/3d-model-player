@@ -7,6 +7,7 @@ const IPCMainChannelName = {
 	FIND_MODEL_FILE: 'FIND_MODEL_FILE',           // 查找模型文件
 	UPLOAD_MODEL_FILE: 'UPLOAD_MODEL_FILE',       // 上传模型文件
 	REMOVE_MODEL_FILE: 'REMOVE_MODEL_FILE',       // 删除模型文件
+	UPDATE_MODEL_DESC: 'UPDATE_MODEL_DESC',       // 更新模型描述文件，用于保存测绘工具数据
 };
 
 /**

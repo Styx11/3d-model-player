@@ -59,4 +59,10 @@ export default class IPCRendererManager
 	{
 		return await ipcRenderer.invoke(IPCMainChannelName.REMOVE_MODEL_FILE, uid)
 	}
+
+	// 更新模型描述文件信息
+	public invokeUpdateModelDesc(model: ModelFileState)
+	{
+		return ipcRenderer.sendSync(IPCMainChannelName.UPDATE_MODEL_DESC, model)
+	}
 }
