@@ -1,3 +1,4 @@
+const { writeFileSync } = require('fs')
 const fs = require('fs/promises')
 const rimraf = require('rimraf')
 const path = require('path')
@@ -126,5 +127,23 @@ export default class ModelManager
 				resolve()
 			})
 		})
+	}
+
+	// 更新描述文件信息，只要用于存储测量工具数据
+	public updateDesc(model: ModelFileState)
+	{
+		if (!model) return
+
+		const modelFolderPath = path.resolve(this._folderPath, `${model.uid}`)
+		const modelDescPath = path.resolve(modelFolderPath, 'desc.json')
+
+		try
+		{
+			writeFileSync(modelDescPath, JSON.stringify(model))
+		}
+		catch (e)
+		{
+			console.error(e)
+		}
 	}
 }
