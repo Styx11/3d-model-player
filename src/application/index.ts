@@ -18,11 +18,16 @@ export default class Application
 		return this._app
 	}
 
+	// 初始化窗口
 	private initWin()
 	{
+		// 预加载窗口
 		const loadingWin = WindowManager.getInstance().createLoadingWindow()
+
+		// 主应用窗口
 		this._win = WindowManager.getInstance().createMainWindow()
 
+		// 主窗口准备完毕后销毁加载窗口，显示主窗口
 		this._win.on('ready-to-show', () =>
 		{
 			setTimeout(() =>
@@ -33,10 +38,16 @@ export default class Application
 		})
 	}
 
+	// 初始化应用
 	public async initApplication()
 	{
+		// 等待应用准备
 		await app.whenReady()
+
+		// 初始化模型文件管理器，其中包括扫描本地文件
 		await ModelManager.getInstance().init()
+
+		// 初始化 ipc-main 管理器
 		IPCMainManager.getInstance().init()
 
 		this.initWin()
