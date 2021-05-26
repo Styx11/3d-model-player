@@ -47,13 +47,12 @@ export const elevation: Module<ElevationPointList, RootState> = {
 		},
 		removeElevationPoint(state: ElevationPointList, key: string)
 		{
-			for (let i = 0; i < state.list.length; i++)
+			const matchIndex = state.list.findIndex(e => e.key === key)
+
+			if (matchIndex > -1)
 			{
-				if (state.list[i].key === key)
-				{
-					state.list.splice(i, 1)
-					console.log('remove elevation point =>', key)
-				}
+				state.list.splice(matchIndex, 1)
+				console.log('remove elevation point =>', key)
 			}
 		}
 	}

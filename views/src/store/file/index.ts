@@ -35,24 +35,21 @@ export const file: Module<ModelFile, RootState> = {
 		},
 		removeFile(state: ModelFile, uid: string)
 		{
-			for (let i = 0; i < state.fileList.length; i++)
+			const matchIndex = state.fileList.findIndex(f => f.uid === uid)
+
+			if (matchIndex > -1)
 			{
-				if (state.fileList[i].uid === uid)
-				{
-					state.fileList.splice(i, 1)
-				}
+				state.fileList.splice(matchIndex, 1)
 			}
 		},
 		updateFile(state: ModelFile, payload: ModelFileState)
 		{
-			for (let i = 0; i < state.fileList.length; i++)
+			const matchIndex = state.fileList.findIndex(f => f.uid === payload.uid)
+
+			if (matchIndex > -1)
 			{
-				if (state.fileList[i].uid === payload.uid)
-				{
-					state.fileList.splice(i, 1, payload)
-					console.log('update fileList =>', payload)
-					break;
-				}
+				state.fileList.splice(matchIndex, 1, payload)
+				console.log('update fileList =>', payload)
 			}
 		},
 	}

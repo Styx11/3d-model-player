@@ -121,12 +121,11 @@ export const entity: Module<CesiumEntity, RootState> = {
 			{
 				if (item.key === payload.type)
 				{
-					for (let i = 0; i < item.children.length; i++)
+					const matchIndex = item.children.findIndex(e => e.key === payload.child.key)
+
+					if (matchIndex > -1)
 					{
-						if (item.children[i].key === payload.child.key)
-						{
-							item.children.splice(i, 1, payload.child)
-						}
+						item.children.splice(matchIndex, 1, payload.child)
 					}
 				}
 			})
@@ -138,12 +137,11 @@ export const entity: Module<CesiumEntity, RootState> = {
 			{
 				if (item.key === payload.type)
 				{
-					for (let i = 0; i < item.children.length; i++)
+					const matchIndex = item.children.findIndex(e => e.key === payload.key)
+
+					if (matchIndex > -1)
 					{
-						if (item.children[i].key === payload.key)
-						{
-							item.children.splice(i, 1)
-						}
+						item.children.splice(matchIndex, 1)
 					}
 				}
 			})
